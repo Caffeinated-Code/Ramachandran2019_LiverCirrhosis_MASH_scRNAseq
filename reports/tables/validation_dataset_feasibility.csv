@@ -1,0 +1,4 @@
+dataset,status,decision,rationale
+GSE244832,public processed archive around 693 MB,highest-priority validation dataset,Human NORMAL/MASL/MASH single-nucleus and multiomic liver dataset centered on HSC activation and anti-fibrotic target discovery.
+GSE207310,public processed gene-level counts,secondary validation,"Human NAFLD/NASH biopsy bulk RNA-seq useful for directionality checks, especially HSC-secreted biomarkers such as SMOC2."
+SCP2154,portal-dependent macrophage atlas,documented expansion path,"Most relevant for macrophage-state validation, but access/export format is less scriptable than GEO in this local run."
