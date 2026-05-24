@@ -36,6 +36,7 @@ results/
 figures/
 tables/
 reports/rendered/
+docs/rendered/
 
 # R and package-management state
 .Rhistory
