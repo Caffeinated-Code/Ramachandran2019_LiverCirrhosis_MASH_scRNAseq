@@ -1,0 +1,79 @@
+# Private/local context
+karyon_ceo_convo.txt
+
+# Raw and external data
+data/raw/
+data/external/
+data/downloads/
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.cram
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# Large single-cell objects and generated analysis artifacts
+*.rds
+*.Rds
+*.rda
+*.RData
+*.rdata
+*.h5ad
+*.h5seurat
+*.loom
+*.h5
+*.mtx
+*.mtx.gz
+*.tsv.gz
+*.csv.gz
+outputs/
+results/
+figures/
+tables/
+reports/rendered/
+
+# R and package-management state
+.Rhistory
+.RData
+.Ruserdata
+renv/library/
+renv/staging/
+renv/python/
+packrat/
+rsconnect/
+
+# Python and notebook cache
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build/cache/log artifacts
+.cache/
+cache/
+tmp/
+temp/
+logs/
+*.log
+*.out
+*.err
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+.DS_Store
+
+# Shiny runtime artifacts
+shinylogs/
+shiny-server/
+*.sqlite
+*.sqlite3
