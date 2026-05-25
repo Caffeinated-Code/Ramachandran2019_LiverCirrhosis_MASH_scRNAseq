@@ -1,0 +1,2 @@
+sample_id,cells,genes,total_counts,median_counts_per_cell,metadata_rows,disease_states,compartments
+gse136103_demo,480,14718,2390617,3722.5,480,cirrhotic;healthy,endothelial;macrophage_monocyte;mesenchymal_HSC_myofibroblast;other_or_unresolved

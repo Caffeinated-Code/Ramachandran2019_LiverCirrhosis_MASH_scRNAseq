@@ -1,0 +1,31 @@
+gsm,sample_number,tissue,sex,tissue_preservation,steatosis_activity_and_fibrosis_score,kleiner_fibrosis_grade,nafld_activity_score,disease_state,fibrosis_numeric,advanced_fibrosis,contrast_group
+GSM6284368,5594,Liver biopsy,Female,RNAlater,NASH,1B,5,NASH,1,FALSE,NASH
+GSM6284369,5595,Liver biopsy,Female,RNAlater,NASH,2,4,NASH,2,TRUE,NASH
+GSM6284370,5596,Liver biopsy,Female,RNAlater,NAFL,1B,4,NAFL,1,FALSE,NAFL
+GSM6284371,5597,Liver biopsy,Female,RNAlater,NAFL,0,2,NAFL,0,FALSE,NAFL
+GSM6284372,5598,Liver biopsy,Female,RNAlater,NAFL,1A,2,NAFL,1,FALSE,NAFL
+GSM6284373,5599,Liver biopsy,Female,RNAlater,NAFL,1B,3,NAFL,1,FALSE,NAFL
+GSM6284374,5600,Liver biopsy,Female,RNAlater,NAFL,2,3,NAFL,2,TRUE,NAFL
+GSM6284375,5601,Liver biopsy,Female,RNAlater,NASH,3,4,NASH,3,TRUE,NASH
+GSM6284376,5602,Liver biopsy,Female,RNAlater,NASH,1B,5,NASH,1,FALSE,NASH
+GSM6284377,5603,Liver biopsy,Female,RNAlater,NASH,2,8,NASH,2,TRUE,NASH
+GSM6284378,5604,Liver biopsy,Female,RNAlater,NAFL,1A,4,NAFL,1,FALSE,NAFL
+GSM6284379,5605,Liver biopsy,Female,RNAlater,NAFL,1A,4,NAFL,1,FALSE,NAFL
+GSM6284380,5606,Liver biopsy,Female,RNAlater,No-NAFLD,1,1,NO-NAFLD,1,FALSE,NO-NAFLD
+GSM6284381,5607,Liver biopsy,Female,RNAlater,NASH,1A,4,NASH,1,FALSE,NASH
+GSM6284382,5608,Liver biopsy,Female,RNAlater,NAFL,1B,5,NAFL,1,FALSE,NAFL
+GSM6284383,5610,Liver biopsy,Female,RNAlater,NAFL,1A,2,NAFL,1,FALSE,NAFL
+GSM6284384,5611,Liver biopsy,Female,RNAlater,No-NAFLD,0,0,NO-NAFLD,0,FALSE,NO-NAFLD
+GSM6284385,5612,Liver biopsy,Female,RNAlater,NAFL,1B,3,NAFL,1,FALSE,NAFL
+GSM6284386,5613,Liver biopsy,Female,RNAlater,NAFL,1A,2,NAFL,1,FALSE,NAFL
+GSM6284387,5614,Liver biopsy,Female,RNAlater,NAFL,0,2,NAFL,0,FALSE,NAFL
+GSM6284388,5615,Liver biopsy,Female,RNAlater,No-NAFLD,0,0,NO-NAFLD,0,FALSE,NO-NAFLD
+GSM6284389,5616,Liver biopsy,Female,RNAlater,No-NAFLD,0,0,NO-NAFLD,0,FALSE,NO-NAFLD
+GSM6284390,5617,Liver biopsy,Female,RNAlater,NASH,2,3,NASH,2,TRUE,NASH
+GSM6284391,5618,Liver biopsy,Female,RNAlater,No-NAFLD,0,0,NO-NAFLD,0,FALSE,NO-NAFLD
+GSM6284392,6477,Liver biopsy,Male,snap frozen,NASH,1A,5,NASH,1,FALSE,NASH
+GSM6284393,6478,Liver biopsy,Male,snap frozen,NAFL,2,2,NAFL,2,TRUE,NAFL
+GSM6284394,6481,Liver biopsy,Female,snap frozen,NASH,2,7,NASH,2,TRUE,NASH
+GSM6284395,6482,Liver biopsy,Male,snap frozen,NASH,2,5,NASH,2,TRUE,NASH
+GSM6284396,6483,Liver biopsy,Female,snap frozen,NAFL,0,3,NAFL,0,FALSE,NAFL
+GSM6284397,6484,Liver biopsy,Female,snap frozen,NAFL,1A,2,NAFL,1,FALSE,NAFL

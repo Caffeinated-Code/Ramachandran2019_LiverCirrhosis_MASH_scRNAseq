@@ -1,10 +1,12 @@
 # Private/local context
-karyon_ceo_convo.txt
+ceo_conversation_private.txt
+assignment_prompt_private.pdf
 
 # Raw and external data
 data/raw/
 data/external/
 data/downloads/
+data/processed/
 data/reference/
 data/validation/
 *.fastq
@@ -70,6 +72,9 @@ logs/
 *.log
 *.out
 *.err
+.nextflow/
+.nextflow.log*
+work/
 
 # Local environment and secrets
 .env

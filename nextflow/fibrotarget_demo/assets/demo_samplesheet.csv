@@ -1,0 +1,2 @@
+sample_id,condition,matrix,features,barcodes,metadata
+gse136103_demo,mixed,data/demo/gse136103_demo_10x/matrix.mtx,data/demo/gse136103_demo_10x/features.tsv,data/demo/gse136103_demo_10x/barcodes.tsv,data/demo/gse136103_demo_metadata.csv

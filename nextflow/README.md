@@ -86,4 +86,4 @@ Tracked target evidence outputs:
 
 The Nextflow layer is an AWS-oriented scaffold. The next engineering step is to turn each R/Python workflow into isolated containerized processes with explicit inputs and outputs, replacing local `make` orchestration inside each process.
 
-Local validation note: this machine does not currently have a usable Java runtime, so Nextflow itself was not executed here. The repository includes the scaffold and configuration, but a Java runtime is required before running `nextflow`.
+Local validation note: Java and Nextflow were installed through Homebrew, and the standalone demo subproject was executed locally. See `reports/nextflow_demo/` for tracked demo outputs.

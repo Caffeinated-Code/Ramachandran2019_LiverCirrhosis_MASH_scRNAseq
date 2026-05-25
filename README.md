@@ -9,7 +9,7 @@ The primary analysis uses **GSE136103**, the Ramachandran et al. human cirrhosis
 For a fast review:
 
 1. [Interviewer guide](docs/interviewer_guide.md)
-2. [Concise Karyon submission summary](reports/karyon_submission_summary.md)
+2. [Rendered executive submission summary](reports/executive_submission_summary.html)
 3. [Translational ranked candidates](reports/tables/ranked_biomarker_target_candidates_translational.csv)
 4. [Marker validation figure](reports/figures/required_compartment_marker_dotplot.png)
 5. [Requirement traceability](reports/requirement_traceability.md)
@@ -21,6 +21,7 @@ For implementation details:
 - [Input and output contract](docs/io_contract.md)
 - [Reproducibility](docs/reproducibility.md)
 - [Nextflow and AWS scaffold](nextflow/README.md)
+- [Standalone Nextflow demo](nextflow/fibrotarget_demo/README.md)
 - [Open-source pipeline roadmap](docs/open_source_pipeline_roadmap.md)
 
 ## What The Repository Is
@@ -75,6 +76,12 @@ Run the full local workflow:
 
 ```bash
 make all
+```
+
+Run the standalone Nextflow demo:
+
+```bash
+make nextflow-demo
 ```
 
 Run individual stages:
@@ -161,9 +168,9 @@ Large data are expected to live in local ignored directories for this repo and i
 ## Current Limitations
 
 - Cell-level differential expression is retained for exploration; donor-level pseudobulk outputs are now the main inferential tables.
-- GSE244832 is prepared and summarized for candidate validation, including a focused HSC-like cluster module; full object-level reanalysis is a future module.
-- GSE207310 is staged, but symbol-level computed validation needs an Ensembl-to-symbol annotation module.
-- The Nextflow layer is a scaffold. It was not executed locally because Java was unavailable on this machine.
+- GSE244832 now has both streamed HSC-like validation summaries and a focused Seurat object reanalysis. Full all-gene object reanalysis remains better suited to AWS.
+- GSE207310 now has symbol-level computed validation with Ensembl mapping and phenotype metadata.
+- A standalone Nextflow demo subproject runs locally with the tracked demo dataset and writes results to `reports/nextflow_demo/`.
 
 ## References
 

@@ -1,6 +1,6 @@
 # Requirement Traceability
 
-This audit maps the Karyon Bio assignment and stakeholder clarification to the repository. Private conversation notes and the assignment PDF are used only for this audit and are not tracked in Git.
+This audit maps the assignment and stakeholder clarification to the repository. Private conversation notes and the assignment PDF are used only for this audit and are not tracked in Git.
 
 ## Assignment Requirements
 
@@ -9,7 +9,7 @@ This audit maps the Karyon Bio assignment and stakeholder clarification to the r
 | Use GSE136103 as the primary dataset | Complete | `config/project.yaml`, `workflow/01_fetch_data.R`, `workflow/02_curate_metadata.R` |
 | Compact end-to-end workflow | Complete | `Makefile`, `workflow/`, `scripts/`, `reports/`, `dashboard/` |
 | Curate and summarize dataset and metadata | Complete | `data/metadata/gse136103_sample_manifest.csv`, `reports/tables/qc_by_library.csv` |
-| QC and preprocessing with choices explained | Complete | `workflow/03_compact_analysis.R`, `reports/run_notes.md`, `reports/karyon_submission_summary.md` |
+| QC and preprocessing with choices explained | Complete | `workflow/03_compact_analysis.R`, `reports/run_notes.md`, `reports/executive_submission_summary.md` |
 | Annotate major liver cell types and validate required compartments | Complete | `workflow/07_refine_annotations.R`, `reports/tables/refined_cluster_annotations.csv`, `reports/figures/required_compartment_marker_dotplot.png`, `reports/figures/umap_refined_cell_states.png` |
 | Required HSC/mesenchymal/myofibroblast compartment | Complete | Marker set in `config/project.yaml`; validation in marker dot plot and pseudobulk tables |
 | Required macrophage/monocyte compartment | Complete | Marker set in `config/project.yaml`; marker validation and candidate evidence |
@@ -18,7 +18,7 @@ This audit maps the Karyon Bio assignment and stakeholder clarification to the r
 | Pathway or mechanism analysis | Complete | `reports/tables/hallmark_pathway_enrichment.csv`, `reports/executive_summary/README.md` |
 | AI/ML-assisted or rule-based biomarker prioritization score | Complete | `workflow/04_prioritize_targets.R`, `config/project.yaml`, `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
 | Ranked list of 10-20 candidates | Complete | `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
-| Explain diagnostic, therapeutic, and validation relevance | Complete | `reports/karyon_submission_summary.md`, `reports/executive_summary/README.md`, candidate table columns |
+| Explain diagnostic, therapeutic, and validation relevance | Complete | `reports/executive_submission_summary.md`, `reports/executive_summary/README.md`, candidate table columns |
 | Reproducible GitHub repository | Complete | `README.md`, `Makefile`, `renv.lock`, `Dockerfile`, `nextflow/` |
 | README with setup instructions | Complete | `README.md` |
 | QC summary | Complete | `reports/tables/qc_by_library.csv`, `reports/tables/qc_filtered_by_library_compartment.csv` |
@@ -26,17 +26,17 @@ This audit maps the Karyon Bio assignment and stakeholder clarification to the r
 | Differential expression results | Complete | `reports/tables/compartment_de_cell_level_exploratory.csv`, `reports/tables/pseudobulk_de_by_refined_state.csv` |
 | Pathway results | Complete | `reports/tables/hallmark_pathway_enrichment.csv` |
 | Ranked biomarker or target table | Complete | `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
-| One-to-two page executive summary | Complete | `reports/karyon_submission_summary.md` |
+| Navigable executive summary | Complete | `reports/executive_submission_summary.Rmd`, `reports/executive_submission_summary.html` |
 | Written responses to all eight screening questions | Complete | `reports/screening_responses/README.md` |
-| Optional validation dataset | Complete | GSE244832 focused HSC validation in `workflow/09_gse244832_hsc_validation.R` and `reports/tables/gse244832_hsc_candidate_validation.csv` |
+| Optional validation dataset | Complete | GSE244832 focused HSC validation and focused Seurat object reanalysis; GSE207310 symbol-level validation |
 
 ## Stakeholder Clarification Applied
 
 | Clarification | Status | Evidence |
 |---|---:|---|
-| Practical-level assignment, not publication-grade | Complete | Scope and limitations in `reports/karyon_submission_summary.md` and `reports/run_notes.md` |
+| Practical-level assignment, not publication-grade | Complete | Scope and limitations in `reports/executive_submission_summary.md` and `reports/run_notes.md` |
 | Show scientific thinking and single-cell/transcriptomic approach | Complete | `reports/screening_responses/README.md`, `reports/executive_summary/README.md` |
-| Interpret liver fibrosis biology, MASH, and cirrhosis critically | Complete | `reports/karyon_submission_summary.md`, `reports/executive_summary/README.md` |
+| Interpret liver fibrosis biology, MASH, and cirrhosis critically | Complete | `reports/executive_submission_summary.md`, `reports/executive_summary/README.md` |
 | Prioritize targets with translational relevance | Complete | `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
 | Use raw/reproducible data processing, not only RData object | Complete | GEO count matrices are primary input; published Seurat object is only a reference layer |
 | Include validation dataset readiness and prioritization | Complete | `docs/validation_datasets.md`, `reports/tables/validation_dataset_feasibility.csv` |
@@ -49,7 +49,7 @@ This audit maps the Karyon Bio assignment and stakeholder clarification to the r
 
 | Gap | Rationale | Next Step |
 |---|---|---|
-| Full GSE207310 computed validation | Data are staged, but files require Ensembl-to-symbol mapping and phenotype harmonization before symbol-level interpretation | Add annotation and phenotype module |
+| Macrophage-focused external validation | Current validation is strongest for HSC and bulk NAFLD/NASH directionality | Add SCP2154 or another accessible macrophage atlas |
 | SCP2154 macrophage atlas validation | Most useful for macrophage candidates, but portal/export logistics make it less reliable for the compact local run | Add as optional portal-dependent module |
-| Full object-level GSE244832 reanalysis | Large matrix makes full local object analysis slower and less portable | Run as a separate Nextflow/AWS job |
+| Full all-gene GSE244832 reanalysis | A focused Seurat object is now implemented; full all-gene reanalysis remains better suited to AWS due matrix size | Run full all-gene object generation as a cloud job |
 | Ligand-receptor mechanism analysis | Addressed in written screening response, but not implemented as a code module | Add LIANA/CellChat/NicheNet module after stable cell-state annotation |

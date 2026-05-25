@@ -75,6 +75,5 @@ Tracked manifests describe local validation data preparation:
 
 ## Known Reproducibility Gaps
 
-- Nextflow was not executed locally because Java was unavailable.
-- GSE207310 needs an Ensembl-to-symbol annotation module before symbol-level computed validation.
-- Full object-level GSE244832 reanalysis should run as a separate cloud job for production use.
+- Java and Nextflow are available locally through Homebrew for the standalone demo project.
+- Full all-gene GSE244832 reanalysis should run as a separate cloud job for production use.

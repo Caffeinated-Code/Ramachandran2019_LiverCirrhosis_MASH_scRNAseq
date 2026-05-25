@@ -16,7 +16,7 @@ The repository is intentionally split into four layers:
 ## Suggested Review Path
 
 1. Start with [README.md](../README.md) for the project identity and key outputs.
-2. Read the concise [Karyon submission summary](../reports/karyon_submission_summary.md).
+2. Read the rendered [executive submission summary](../reports/executive_submission_summary.html).
 3. Inspect the ranked table:
    - [ranked_biomarker_target_candidates_translational.csv](../reports/tables/ranked_biomarker_target_candidates_translational.csv)
 4. Review the marker validation figure:
@@ -32,6 +32,7 @@ Rscript -e "shiny::runApp('dashboard')"
    - [io_contract.md](io_contract.md)
    - [reproducibility.md](reproducibility.md)
    - [nextflow/README.md](../nextflow/README.md)
+   - [standalone Nextflow demo](../nextflow/fibrotarget_demo/README.md)
 
 ## What To Look For
 
@@ -45,6 +46,6 @@ Rscript -e "shiny::runApp('dashboard')"
 
 ## Known Limitations
 
-- GSE244832 is prepared and summarized for candidate validation, including focused HSC-like cluster validation; full object-level reanalysis is a future module.
-- GSE207310 is staged, but symbol-level computed validation still needs Ensembl-to-symbol annotation.
-- The Nextflow layer is a scaffold. Java was not available locally, so it was not executed on this machine.
+- GSE244832 has focused HSC-like summaries and a focused Seurat object reanalysis; full all-gene validation is the cloud-scale extension.
+- GSE207310 has symbol-level validation for the priority candidate set.
+- The standalone Nextflow demo runs locally and produces tracked demo outputs.

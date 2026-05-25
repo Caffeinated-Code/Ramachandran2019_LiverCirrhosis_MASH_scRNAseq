@@ -13,5 +13,5 @@ renv/staging
 *.RData
 *.h5ad
 *.h5seurat
-karyon_ceo_convo.txt
-Karyon_Bio_Candidate_Assignment.pdf
+ceo_conversation_private.txt
+assignment_prompt_private.pdf

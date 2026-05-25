@@ -1,8 +1,8 @@
-# Karyon Bio Submission Summary
+# Executive Submission Summary
 
 ## Project
 
-**FibroTarget-Liver** is a compact, reproducible single-cell workflow for discovering and prioritizing cell-type-specific biomarkers and therapeutic target candidates in human liver fibrosis. The primary analysis uses **GSE136103**, a human liver cirrhosis scRNA-seq dataset, and validates selected candidates with **GSE244832**, a MASLD/MASH hepatic stellate cell-focused dataset. GSE207310 is staged as a second validation source for SMOC2 and NAFLD/NASH biomarker directionality.
+**FibroTarget-Liver** is a compact, reproducible single-cell workflow for discovering and prioritizing cell-type-specific biomarkers and therapeutic target candidates in human liver fibrosis. The primary analysis uses **GSE136103**, a human liver cirrhosis scRNA-seq dataset, and validates selected candidates with **GSE244832**, a MASLD/MASH hepatic stellate cell-focused dataset. GSE207310 adds symbol-level bulk RNA-seq validation for SMOC2 and NAFLD/NASH biomarker directionality.
 
 The repository is organized as an analysis pipeline with clear boundaries across `Makefile`, `renv.lock`, `Dockerfile`, `config/project.yaml`, `workflow/`, `scripts/`, `nextflow/`, `reports/`, and `dashboard/`. Raw data, large Seurat objects, validation matrices, private notes, and the assignment PDF are excluded from Git.
 
@@ -53,6 +53,6 @@ Public evidence enrichment adds UniProt localization and tissue comments, PubMed
 
 ## Limitations And Next Steps
 
-The compact workflow is designed to show scientific judgment and execution, not to claim a final therapeutic program. GSE207310 still needs symbol-level computed validation and phenotype mapping. Macrophage candidates need an additional macrophage-focused atlas such as SCP2154 or another accessible fibrosis atlas. PLVAP, ACKR1, SMOC2, TIMP1, and collagen candidates should be validated with spatial transcriptomics, immunostaining, or proteomics to confirm scar-niche localization. PDGFRA/B target nomination should move next into perturbation assays such as HSC spheroids, co-culture, or precision-cut liver slices.
+The compact workflow is designed to show scientific judgment and execution. Macrophage candidates need an additional macrophage-focused atlas such as SCP2154 or another accessible fibrosis atlas. PLVAP, ACKR1, SMOC2, TIMP1, and collagen candidates should be validated with spatial transcriptomics, immunostaining, or proteomics to confirm scar-niche localization. PDGFRA/B target nomination should move next into perturbation assays such as HSC spheroids, co-culture, or precision-cut liver slices.
 
 No clarifying questions remain for the submitted compact assignment.
