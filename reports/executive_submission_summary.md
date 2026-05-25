@@ -41,7 +41,7 @@ Key validation signal: SMOC2, TIMP1, PDGFRA, and PDGFRB show higher expression i
 
 Public evidence enrichment adds UniProt localization and tissue comments, PubMed perturbation/safety signal, ClinicalTrials.gov context, Open Targets tractability/safety annotations, ClinVar counts, and mouse orthology through `babelgene`. These are triage layers, not proof of causality.
 
-## What To Review
+## What To Open
 
 - Main README: `README.md`
 - Written screening responses: `reports/screening_responses/README.md`

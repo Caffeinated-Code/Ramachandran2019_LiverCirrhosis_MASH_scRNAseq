@@ -1,6 +1,6 @@
-# Interviewer Guide
+# Project Navigation
 
-This guide is the fastest way to review the repository.
+This guide is the fastest way to understand the repository.
 
 ## What This Is
 
@@ -11,15 +11,15 @@ The repository is intentionally split into four layers:
 1. **Analysis code**: reusable R and Python scripts in `workflow/`, `src/`, and `scripts/`.
 2. **Reproducible pipelines**: `Makefile`, `config/project.yaml`, `Dockerfile`, `renv.lock`, and `nextflow/`.
 3. **Demo and validation data products**: small tracked demo data and compact validation summaries.
-4. **Review artifacts**: executive summary, figures, tables, dashboard, and written responses.
+4. **Outputs**: executive summary, figures, tables, dashboard, and written responses.
 
-## Suggested Review Path
+## Suggested Path
 
 1. Start with [README.md](../README.md) for the project identity and key outputs.
 2. Read the rendered [executive submission summary](../reports/executive_submission_summary.html).
 3. Inspect the ranked table:
    - [ranked_biomarker_target_candidates_translational.csv](../reports/tables/ranked_biomarker_target_candidates_translational.csv)
-4. Review the marker validation figure:
+4. Inspect the marker validation figure:
    - [required_compartment_marker_dotplot.png](../reports/figures/required_compartment_marker_dotplot.png)
 5. Open the dashboard locally:
 
@@ -27,7 +27,7 @@ The repository is intentionally split into four layers:
 Rscript -e "shiny::runApp('dashboard')"
 ```
 
-6. Review production readiness:
+6. Inspect production readiness:
    - [architecture.md](architecture.md)
    - [io_contract.md](io_contract.md)
    - [reproducibility.md](reproducibility.md)
@@ -42,7 +42,7 @@ Rscript -e "shiny::runApp('dashboard')"
 - Donor-level pseudobulk DE is available and should be favored over exploratory cell-level DE.
 - Target prioritization separates biomarker value from therapeutic target plausibility.
 - Validation and public target evidence are modular and reproducible.
-- Large raw and derived data are excluded from Git; compact outputs are tracked for review.
+- Large raw and derived data are excluded from Git; compact outputs are tracked for inspection.
 
 ## Known Limitations
 

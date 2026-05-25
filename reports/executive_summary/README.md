@@ -24,7 +24,7 @@ Major steps:
 6. Ran exploratory compartment-level cirrhotic versus healthy differential expression.
 7. Ran Hallmark pathway enrichment on compartment-specific upregulated genes.
 8. Built a transparent target prioritization score using data support, biology, validation evidence, modality, conservation, and translational risk.
-9. Prepared dashboard-ready files for interactive review.
+9. Prepared dashboard-ready files for interactive exploration.
 10. Refined cluster labels against the published Ramachandran Seurat annotation object from Edinburgh DataShare.
 11. Re-ran disease differential expression as donor-level pseudobulk models per refined cell state.
 12. Ran focused GSE244832 validation for HSC/myofibroblast candidates.
@@ -46,7 +46,7 @@ Top ranked candidates in this compact run included ACKR1, PLVAP, TIMP1, COL3A1, 
 
 The strongest immediate biomarker signals are endothelial and matrix/stromal. ACKR1 and PLVAP are consistent with scar-associated endothelial remodeling in cirrhosis. COL1A1, COL3A1, TIMP1, LUM, DCN, and MMP2 reflect scar matrix and remodeling biology, but most are better positioned as tissue-state or pharmacodynamic markers than direct therapeutic targets.
 
-The most plausible therapeutic target class in this compact analysis is receptor or enzyme biology connected to activated stromal states. PDGFRA and PDGFRB are biologically coherent, druggable receptor tyrosine kinases, but safety and vascular or broad mesenchymal effects would need careful review. LOXL2 is mechanistically attractive as a collagen crosslinking enzyme, although prior clinical fibrosis efforts make it a high-risk target rather than a simple win.
+The most plausible therapeutic target class in this compact analysis is receptor or enzyme biology connected to activated stromal states. PDGFRA and PDGFRB are biologically coherent, druggable receptor tyrosine kinases, but safety and vascular or broad mesenchymal effects need careful evaluation. LOXL2 is mechanistically attractive as a collagen crosslinking enzyme, although prior clinical fibrosis efforts make it a high-risk target rather than a simple win.
 
 Macrophage candidates require more caution. SPP1 and CD9 have direct signal in the compact analysis. TREM2 and GPNMB are retained because of strong external and published disease-state evidence, but they did not receive direct compartment-matched DE support in this marker-score run. They should be considered macrophage-state biomarkers or validation priorities before being treated as target candidates.
 
@@ -97,11 +97,11 @@ SCP2154 is most relevant for macrophage-state validation but is portal-dependent
 
 The enriched candidate table adds public evidence from MyGene.info, Open Targets, ClinicalTrials.gov, and ClinVar. These resources help flag tractability, clinical trial context, sponsors, trial phases, safety-liability annotations, and clinical variant knowledge.
 
-These signals are treated as triage evidence. ClinicalTrials.gov matches are broad text-query matches and require manual review before making claims about a specific target-program relationship.
+These signals are treated as triage evidence. ClinicalTrials.gov matches are broad text-query matches and require manual verification before making claims about a specific target-program relationship.
 
 ## Limitations
 
-This compact analysis is designed for practical review and clear translational prioritization.
+This compact analysis is designed for practical interpretation and clear translational prioritization.
 
 - Cell-level DE is exploratory because cells from the same donor are not independent biological replicates.
 - Marker-score compartment calls recover the required broad compartments but do not replace full expert annotation.

@@ -1,6 +1,6 @@
 # Architecture
 
-FibroTarget-Liver is organized to keep analysis code, pipeline orchestration, exploratory assets, and review artifacts separate.
+FibroTarget-Liver is organized to keep analysis code, pipeline orchestration, exploratory assets, and outputs separate.
 
 ## Layer 1: Analysis Code
 
@@ -46,9 +46,9 @@ Not tracked:
 - large Seurat objects
 - logs and runtime caches
 
-## Layer 4: Review Artifacts
+## Layer 4: Outputs
 
-Reviewer-facing outputs live under:
+Project outputs live under:
 
 - `reports/executive_summary/`
 - `reports/screening_responses/`

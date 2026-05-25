@@ -1,12 +1,12 @@
-# Reports And Review Artifacts
+# Reports And Outputs
 
-This folder contains reviewable outputs, not core pipeline code.
+This folder contains analysis outputs, not core pipeline code.
 
 ## Narrative Outputs
 
 - `executive_summary/README.md`: concise scientific summary and interpretation
 - `executive_submission_summary.Rmd`: source for the rendered executive summary
-- `executive_submission_summary.html`: navigable HTML executive summary for review
+- `executive_submission_summary.html`: navigable HTML executive summary
 - `executive_submission_summary.md`: concise text version of the submission summary
 - `requirement_traceability.md`: checklist mapping assignment requirements to repo evidence
 - `screening_responses/README.md`: written responses to the eight screening questions

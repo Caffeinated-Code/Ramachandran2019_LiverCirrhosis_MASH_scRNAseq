@@ -1,6 +1,6 @@
 # Interactive Dashboard
 
-The dashboard is a Shiny app for reviewing the compact analysis outputs.
+The dashboard is a Shiny app for exploring the compact analysis outputs.
 
 Run from the repository root:
 

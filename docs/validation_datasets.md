@@ -1,6 +1,6 @@
 # Validation Dataset Preparation
 
-Two validation datasets are prepared locally and summarized into compact review tables.
+Two validation datasets are prepared locally and summarized into compact analysis tables.
 
 ## GSE244832
 

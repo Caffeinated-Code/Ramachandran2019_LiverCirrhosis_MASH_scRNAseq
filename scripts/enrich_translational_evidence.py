@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add localization, tissue, perturbation, and trial-context evidence for target review."""
+"""Add localization, tissue, perturbation, and trial-context evidence for target evaluation."""
 
 from __future__ import annotations
 

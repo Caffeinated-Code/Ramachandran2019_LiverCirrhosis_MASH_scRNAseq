@@ -29,9 +29,9 @@ make translational-evidence
 
 Interpretation notes:
 
-- ClinicalTrials.gov matches are broad text-query matches and should be manually reviewed before making company or trial-stage claims.
+- ClinicalTrials.gov matches are broad text-query matches and should be manually verified before making company or trial-stage claims.
 - Open Targets tractability is useful for druggability triage, but it is not a liver-specific safety assessment.
 - ClinVar gene-level counts indicate clinical variant knowledge, not whether a fibrosis target is safe or causal.
-- PubMed counts and PMIDs are triage signals, not systematic reviews.
+- PubMed counts and PMIDs are triage signals, not systematic literature assessments.
 - Mouse orthology supports preclinical feasibility, but conserved expression does not guarantee conserved disease function.
 - These evidence layers should supplement, not replace, donor-aware disease biology and validation data.

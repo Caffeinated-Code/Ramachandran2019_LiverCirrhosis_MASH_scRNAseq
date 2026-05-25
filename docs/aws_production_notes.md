@@ -49,7 +49,7 @@ Recommended future AWS components:
 
 - Keep data paths config-driven.
 - Keep workflow steps restartable.
-- Write small, reviewable tables for interpretation.
+- Write small, interpretable tables for interpretation.
 - Treat single-cell objects as derived artifacts, not source code.
 - Separate scientific outputs from operational logs.
 - Make validation datasets modular so a failed optional validation does not block the primary analysis.

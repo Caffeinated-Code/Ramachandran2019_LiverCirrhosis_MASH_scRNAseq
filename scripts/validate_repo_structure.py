@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lightweight repository integrity checks for reviewer-facing navigation."""
+"""Lightweight repository integrity checks for required project files."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ REQUIRED = [
     "Dockerfile",
     "renv.lock",
     "config/project.yaml",
-    "docs/interviewer_guide.md",
+    "docs/project_navigation.md",
     "docs/architecture.md",
     "docs/io_contract.md",
     "docs/reproducibility.md",

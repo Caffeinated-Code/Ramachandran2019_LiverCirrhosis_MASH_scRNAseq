@@ -1,19 +1,19 @@
-# Interview Walkthrough
+# Presentation Walkthrough
 
-This document is for rehearsing the repo review with a senior bioinformatics reviewer. Keep the presentation direct. The goal is to walk through the analysis end to end, invite corrections, make edits, then move to the next section.
+This document is for rehearsing the project presentation with a senior bioinformatics colleague. Keep the presentation direct. The goal is to walk through the analysis end to end, invite corrections, make edits, then move to the next section.
 
-## Review Loop
+## Feedback Loop
 
 For each section:
 
 1. Present the section in 2-4 minutes.
 2. Ask: "What would you challenge or clarify here?"
-3. Log the feedback in `reports/review_feedback_log.md`.
+3. Log the feedback in `reports/feedback_log.md`.
 4. Make the correction in the repo or report.
 5. Re-present the corrected section.
-6. Move on only after the reviewer is satisfied.
+6. Move on only after the section is clear.
 
-## Fast Review Path
+## Fast Path
 
 Open these first:
 
@@ -90,7 +90,7 @@ Then show:
 
 Key point:
 
-> The repo is meant to be easy to review first and easy to rerun second.
+> The repo is meant to be easy to understand first and easy to rerun second.
 
 Ask for feedback:
 
@@ -100,7 +100,7 @@ Ask for feedback:
 
 What to say:
 
-> Before going into the biology, I mapped the assignment outcomes to concrete repo artifacts. This keeps the review grounded. The traceability table shows where QC, annotation, DE, pathway analysis, prioritization, validation, written responses, and reproducibility are handled.
+> Before going into the biology, I mapped the assignment outcomes to concrete repo artifacts. This keeps the discussion grounded. The traceability table shows where QC, annotation, DE, pathway analysis, prioritization, validation, written responses, and reproducibility are handled.
 
 Then show:
 
@@ -108,7 +108,7 @@ Then show:
 
 Key point:
 
-> This avoids making the reviewer hunt for evidence.
+> This avoids making anyone hunt for evidence.
 
 Expected challenge:
 

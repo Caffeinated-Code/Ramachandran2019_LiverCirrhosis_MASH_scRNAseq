@@ -1,14 +1,14 @@
 # FibroTarget-Liver
 
-**FibroTarget-Liver** is a reproducible single-cell target-discovery workflow for human liver fibrosis, MASH, and cirrhosis. It starts from public count matrices, runs a Seurat-based analysis, validates candidate targets against external liver disease datasets, enriches targets with public evidence, and packages the results for review in tables, figures, reports, and a Shiny dashboard.
+**FibroTarget-Liver** is a reproducible single-cell target-discovery workflow for human liver fibrosis, MASH, and cirrhosis. It starts from public count matrices, runs a Seurat-based analysis, validates candidate targets against external liver disease datasets, enriches targets with public evidence, and packages the results as tables, figures, reports, and a Shiny dashboard.
 
 The primary analysis uses **GSE136103**, the Ramachandran et al. human cirrhosis single-cell RNA-seq dataset. Validation support uses **GSE244832** for MASH/HSC target evidence and **GSE207310** for bulk NAFLD/NASH biomarker directionality.
 
 ## Start Here
 
-For a fast review:
+Start here:
 
-1. [Interviewer guide](docs/interviewer_guide.md)
+1. [Project navigation](docs/project_navigation.md)
 2. [Rendered executive submission summary](reports/executive_submission_summary.html)
 3. [Translational ranked candidates](reports/tables/ranked_biomarker_target_candidates_translational.csv)
 4. [Marker validation figure](reports/figures/required_compartment_marker_dotplot.png)
@@ -33,7 +33,7 @@ It separates:
 - analysis code in `workflow/`, `src/`, and `scripts/`
 - reproducible execution in `Makefile`, `renv.lock`, `Dockerfile`, and `nextflow/`
 - data contracts and metadata in `config/` and `data/metadata/`
-- review artifacts in `reports/`, `dashboard/`, and `docs/`
+- outputs in `reports/`, `dashboard/`, and `docs/`
 
 ## Main Scientific Question
 

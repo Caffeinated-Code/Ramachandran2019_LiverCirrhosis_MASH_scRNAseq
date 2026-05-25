@@ -60,7 +60,7 @@ merged <- candidates |>
       TRUE ~ "secondary evidence candidate"
     ),
     nomination_caution = case_when(
-      grepl("broad|vascular|pleiotropic|pericyte|wound", clinical_caution, ignore.case = TRUE) ~ "requires tissue-specificity and safety review",
+      grepl("broad|vascular|pleiotropic|pericyte|wound", clinical_caution, ignore.case = TRUE) ~ "requires tissue-specificity and safety evaluation",
       TRUE ~ "standard orthogonal validation required"
     )
   )

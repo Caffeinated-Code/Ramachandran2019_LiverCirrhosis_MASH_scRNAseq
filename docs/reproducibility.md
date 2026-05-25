@@ -1,6 +1,6 @@
 # Reproducibility
 
-The repository is designed so a reviewer can inspect outputs immediately and rerun the analysis when the required public data are available.
+The repository is designed so the outputs can be inspected immediately and the analysis can be rerun when the required public data are available.
 
 ## Environment
 
@@ -58,7 +58,7 @@ Run the lightweight repository validation:
 make validate-repo
 ```
 
-This checks that required reviewer-facing files are present and that private or large local data are not tracked by Git.
+This checks that required project files are present and that private or large local data are not tracked by Git.
 
 ## Data Provenance
 

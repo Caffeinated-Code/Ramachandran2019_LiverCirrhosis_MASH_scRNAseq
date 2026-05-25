@@ -23,7 +23,7 @@ help:
 	@echo "  make report       Render text report artifacts"
 	@echo "  make render-summary Render executive HTML summary"
 	@echo "  make nextflow-demo Run the standalone Nextflow demo subproject"
-	@echo "  make validate-repo Check reviewer-facing repo structure"
+	@echo "  make validate-repo Check required repo structure"
 	@echo "  make all          Run the local compact workflow"
 
 setup:

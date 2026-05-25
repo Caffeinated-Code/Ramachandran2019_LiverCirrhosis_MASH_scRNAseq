@@ -55,7 +55,7 @@ Recommended fields:
 
 ## Main Outputs
 
-Small, reviewable outputs:
+Small, inspectable outputs:
 
 - `reports/tables/qc_by_library.csv`
 - `reports/tables/qc_filtered_by_library_compartment.csv`

@@ -1,87 +1,115 @@
 # Written Screening Responses
 
+These responses are written from the same framework I would use in a liver disease target-discovery program: start with clean metadata, protect true disease biology during preprocessing, test at the donor level, and only nominate targets after asking whether the signal is biologically coherent, assayable, conserved, and safe enough to move toward experiments.
+
+My prior work at CAMP4 shaped that lens. CAMP4’s public platform focuses on regulatory RNA biology and ASO-based gene upregulation, with programs in CNS and metabolic disease. In that kind of target-prioritization setting, a gene is not interesting just because it changes. It has to connect to disease biology, the right cell type, a plausible modality, a measurable biomarker strategy, and a realistic translational path.
+
 ## 01. Dataset Curation And Fibrosis-Stage Harmonization
 
-I would start by separating clinical harmonization from computational integration. Each dataset gets a sample manifest with donor ID, tissue source, assay type, species, disease label, fibrosis label, histology system, biopsy source, sequencing chemistry, and available covariates. I would preserve the original labels and add a harmonized label rather than overwriting source metadata.
+I would start with a sample manifest before touching integration. Each dataset needs donor ID, tissue source, assay type, species, disease label, fibrosis label, histology system, biopsy source, chemistry, batch, and available covariates. I would keep the original labels and add harmonized labels in separate fields, so the analysis never loses the source-study context.
 
-For fibrosis, I would map labels into two levels. The first is a coarse label suitable for robust analysis: no or mild fibrosis, significant fibrosis, advanced fibrosis, and cirrhosis. The second is the original study-specific label, such as METAVIR, Kleiner, cirrhosis/non-cirrhosis, MASL, MASH, or NAFLD/NASH. I would not force all studies into a fake F0-F4 scale if the source metadata do not support it.
+For fibrosis labels, I would use two levels. The first is a practical harmonized label: no or mild fibrosis, significant fibrosis, advanced fibrosis, and cirrhosis. The second preserves the original label, such as METAVIR F0-F4, Kleiner grade, cirrhosis/non-cirrhosis, NAFL/NASH, or MASL/MASH. I would not force incomplete metadata into a false F0-F4 scale.
 
-Before biomarker discovery, I would check whether disease labels track expected biology: collagen programs in stromal cells, macrophage activation states, endothelial remodeling, ductular reaction, and hepatocyte stress. If a dataset label does not align with biology or metadata, I would flag it for sensitivity analysis rather than excluding it silently.
+Then I would check whether labels match expected biology. In advanced fibrosis I expect collagen and matrix programs in stromal cells, scar-associated macrophage states, endothelial remodeling, ductular reaction, and hepatocyte stress. If the clinical label and biology disagree, I would not quietly drop the sample. I would flag it for sensitivity analysis.
+
+This is similar to how I think about metabolic liver disease target prioritization from my CAMP4 experience. The disease label is only the starting point. The decision becomes stronger when the label, tissue biology, cell-state signal, and translational hypothesis all point in the same direction.
 
 ## 02. QC And Preprocessing For Liver scRNA-seq/snRNA-seq
 
-QC should remove technical failures without deleting disease biology. I would inspect nUMI, nGene, mitochondrial fraction, ribosomal fraction, ambient RNA, doublet probability, and per-sample cell yield. Thresholds should be sample-aware because cirrhotic tissue and nuclei data can look different from healthy tissue.
+QC should remove technical failures without deleting diseased cells. In liver fibrosis, stressed cells are often part of the phenotype. I would inspect nUMI, nGene, mitochondrial fraction, ribosomal fraction, ambient RNA, doublet probability, and per-sample cell yield. Thresholds should be sample-aware because cirrhotic tissue, fatty liver tissue, and nuclei data can look different from healthy scRNA-seq.
 
-For scRNA-seq, high mitochondrial fraction can indicate dying cells, but in injured liver it can also track stressed biology. I would avoid one hard universal cutoff. For snRNA-seq, mitochondrial thresholds are less informative, and intronic reads and nuclear gene capture matter more.
+For scRNA-seq, high mitochondrial fraction can mean dying cells, but it can also track stressed hepatocytes or injured tissue. For snRNA-seq, mitochondrial fraction is less informative, and intronic read capture matters more. I would set initial thresholds, then check whether key disease populations disappear after filtering.
 
-I would use doublet detection and ambient RNA correction where possible, then check whether key populations disappear after filtering. If a fibrosis-associated macrophage or activated stellate population is removed mainly because it is stressed, that is a red flag. The QC report should show before/after plots by donor and disease state.
+I would use doublet detection and ambient RNA correction where practical. The important check is biological: if activated stellate cells, scar-associated macrophages, or endothelial remodeling states vanish after QC, I would revisit the cutoff instead of assuming the filter was correct.
+
+For a drug-discovery program, I would also keep a QC decision log. Downstream target calls are only as good as the sample and cell-state decisions that produced them.
 
 ## 03. Integration Without Erasing Fibrosis Biology
 
-The main risk in integration is correcting away the disease signal. I would first analyze each dataset separately and confirm expected biology before integration. Then I would integrate using methods such as Seurat integration, Harmony, or scVI, but evaluate whether known fibrosis programs remain visible after correction.
+The main risk in integration is correcting away the biology we care about. I would first analyze each dataset separately and confirm the expected disease programs before integration. Then I would integrate for visualization and annotation using Seurat integration, Harmony, scVI, or a similar method.
 
-I would avoid using fibrosis stage itself as a batch variable. I would check UMAPs and PCA loadings by donor, assay, chemistry, and disease. I would also compare differential expression before and after integration. If integration removes COL1A1/COL3A1 stromal programs, TREM2/CD9 macrophage states, or PLVAP/ACKR1 endothelial remodeling, it is too aggressive.
+I would not use fibrosis stage itself as a batch variable. I would check UMAPs and PCA loadings by donor, assay, chemistry, tissue source, and disease. I would also compare differential expression before and after integration. If integration removes COL1A1/COL3A1 stromal programs, TREM2/CD9 macrophage states, or PLVAP/ACKR1 endothelial remodeling, the integration is too aggressive for discovery.
 
-For discovery, I prefer integration for visualization and annotation, but donor-aware testing on raw or normalized counts within cell types for inference.
+My preference is to use integration for cell-state alignment and annotation, then use donor-aware testing on raw counts or appropriately normalized counts for inference. The final disease signal should not depend only on an integrated embedding.
 
-## 04. Fibroblast Cluster Validation
+This mirrors how I would approach a target-prioritization project in industry. Integration should make biology easier to interpret, not make every sample look artificially similar.
 
-A cluster expressing COL1A1, COL3A1, ACTA2, TAGLN, PDGFRB, LUM, and DCN and enriched in F3/F4 samples is clearly fibrogenic, but I would not immediately call it one pure cell type. It could include activated hepatic stellate cells, portal fibroblasts, vascular mural cells, or myofibroblast-like states.
+## 04. Cell-Type Annotation And Validation In Fibrotic Liver
 
-I would validate it by checking:
+A cluster expressing COL1A1, COL3A1, ACTA2, TAGLN, PDGFRB, LUM, and DCN and enriched in F3/F4 samples is clearly fibrogenic, but I would not immediately call it one pure cell type. It could contain activated hepatic stellate cells, portal fibroblasts, vascular mural cells, pericyte-like cells, or myofibroblast-like states.
 
-- quiescent HSC markers and vitamin A-associated genes
-- portal fibroblast-associated markers such as THY1 and elastin/matrix programs
+I would validate it in layers:
+
+- quiescent HSC and vitamin A-associated markers
+- portal fibroblast-associated markers such as THY1 and elastin or matrix programs
 - pericyte and vascular mural markers such as RGS5 and MCAM
 - activated myofibroblast markers such as ACTA2, TAGLN, COL1A1, and TIMP1
-- donor distribution and whether the cluster is present across multiple F3/F4 donors
-- spatial or histology evidence if available
+- donor distribution across multiple F3/F4 samples
+- spatial, histology, or protein evidence if available
 
-My label would likely be conservative: activated mesenchymal or myofibroblast-like stromal state, with subannotation after deeper validation.
+My label would be conservative at first: activated mesenchymal or HSC/myofibroblast-like stromal state. I would only split it into finer labels if marker evidence, donor support, and spatial context support the separation.
+
+For target discovery, this distinction matters. A marker of activated stromal biology can be useful, but a therapeutic hypothesis may change depending on whether the signal is mainly HSC, portal fibroblast, pericyte, or vascular-associated.
 
 ## 05. Donor-Aware Differential Expression
 
-Simple cell-level DE is dangerous because cells are not independent replicates. A dataset with thousands of cells from one donor can dominate the p-value and create false confidence. This is pseudoreplication.
+Simple cell-level differential expression is risky because cells are not independent biological replicates. A dataset with many cells from one donor can dominate the p-value. That creates false confidence.
 
-I would use pseudobulk differential expression when donor/sample metadata support it. Cells are aggregated by donor, condition, and cell type or cell state. Then a bulk RNA-seq model such as edgeR, DESeq2, or limma-voom can test disease effects using donor-level replication.
+I would use pseudobulk differential expression when donor or sample metadata support it. Cells are aggregated by donor, condition, and cell type or cell state. Then a bulk RNA-seq model such as edgeR, DESeq2, or limma-voom can test disease effects using donor-level replication.
 
-If donor count is small, I would report effect sizes, donor consistency, and confidence intervals rather than overemphasizing adjusted p-values. Cell-level DE can still help generate hypotheses, but it should not be the sole basis for target nomination.
+If donor count is small, I would emphasize effect size, donor consistency, and confidence intervals. Cell-level DE can still help generate hypotheses, but it should not be the basis for target nomination.
 
-## 06. AI/ML-Based Biomarker Prioritization
+This is the same reasoning I would apply in a metabolic liver disease program. If a candidate is going to drive experimental follow-up, I want to know that the signal appears across donors, not just across thousands of cells from one sample.
 
-With 300 candidate genes and limited donors, I would start with a transparent scoring model because it is interpretable, auditable, and easier to defend biologically.
+## 06. ML-Based Biomarker Prioritization
 
-The model would score each candidate across disease effect size, donor consistency, cell-type specificity, pathway support, validation in external datasets, secreted or surface protein status, druggability, assayability, mouse conservation, and safety risk. Literature and public resources can add evidence, but they should not override weak primary data without being labeled as external support.
+With 300 candidate genes and limited donors, I would start with a transparent scoring model. It is easier to explain, audit, and adjust with biology.
 
-If enough validation datasets are available, I would use ML for ranking stability or feature weighting. For example, one could train models to distinguish fibrosis stage using pseudobulk cell-type signatures, then ask which genes consistently contribute across folds and datasets. The final list should still be reviewed biologically.
+The score would include:
+
+- disease effect size
+- donor consistency
+- cell-type specificity
+- pathway support
+- validation in external datasets
+- secreted, surface, receptor, or enzyme status
+- druggability and assayability
+- mouse conservation
+- safety or tissue-specificity risk
+
+I would use ML when there are enough datasets to support it. For example, a model could classify fibrosis stage from cell-type pseudobulk signatures, then identify genes that contribute consistently across folds and external datasets. I would still biologically check the final list.
+
+My CAMP4 experience makes me think about modality early. A candidate can be statistically strong and still be a poor target. For an ASO or regulatory RNA strategy, the direction of modulation matters. For a secreted biomarker, assayability and disease specificity matter. For a receptor target, cell specificity and safety matter. The prioritization model should reflect those differences.
 
 ## 07. Cell-Cell Communication And Mechanism Discovery
 
-I would analyze ligand-receptor communication among scar-associated macrophages, activated mesenchymal cells, endothelial cells, cholangiocytes, and injured hepatocytes. Tools such as CellPhoneDB, NicheNet, LIANA, or CellChat can generate hypotheses.
+I would analyze ligand-receptor communication among scar-associated macrophages, activated mesenchymal cells, endothelial cells, cholangiocytes, and injured hepatocytes. Tools such as CellPhoneDB, NicheNet, LIANA, or CellChat can generate useful hypotheses.
 
-The pitfall is overinterpretation. Ligand-receptor tools infer possible communication from expression. They do not prove contact, directionality, protein abundance, or functional effect.
+The pitfall is overinterpretation. Ligand-receptor tools infer possible communication from expression. They do not prove contact, directionality, protein abundance, secretion, receptor activation, or functional effect.
 
-I would prioritize interactions only if:
+I would prioritize interactions only when:
 
 - the sender and receiver cell states are disease-enriched
-- ligand and receptor are expressed in enough donors
+- ligand and receptor are expressed across enough donors
 - the interaction fits pathway evidence
-- target genes in the receiver support the mechanism
-- the interaction is supported by spatial, perturbation, or literature evidence
+- receiver target genes support the proposed mechanism
+- spatial, perturbation, or literature evidence supports the interaction
 
-For this project, macrophage-to-stellate and endothelial-to-immune trafficking hypotheses are useful, but they should be presented as mechanisms to validate.
+In liver fibrosis, macrophage-to-stellate and endothelial-to-immune trafficking hypotheses are high value. I would treat them as experiment-generating mechanisms, not final proof.
 
 ## 08. Reproducible Pipeline And Delivery Plan
 
-For a 12-16 week project, I would structure the work as a production-style analysis program:
+For a 12-16 week project, I would structure the work as a production-style analysis program.
 
 1. Weeks 1-2: dataset inventory, metadata harmonization, access checks, and pipeline skeleton.
 2. Weeks 3-4: QC, preprocessing, doublet and ambient RNA handling, and sample-level reports.
-3. Weeks 5-6: annotation, reference mapping, marker validation, and disease compartment review.
+3. Weeks 5-6: annotation, reference mapping, marker validation, and disease compartment evaluation.
 4. Weeks 7-8: donor-aware DE, pathway analysis, and mechanism analysis.
 5. Weeks 9-10: external validation across MASH, fibrosis, and macrophage datasets.
 6. Weeks 11-12: target scoring, druggability, conservation, and safety triage.
-7. Weeks 13-14: dashboard, reproducible reports, and stakeholder review.
+7. Weeks 13-14: dashboard, reproducible reports, and stakeholder discussion.
 8. Weeks 15-16: final documentation, handoff, and next-experiment plan.
 
-The repository should include Docker, `renv`, config files, modular scripts, small reviewable outputs, dashboard-ready files, and clear run instructions. Large data and derived single-cell objects should live in object storage, not Git. In AWS, I would map the same steps to S3, ECR, AWS Batch or ECS, Step Functions, and CloudWatch logs.
+The repository should include Docker, `renv`, config files, modular scripts, compact outputs, dashboard-ready files, and clear run instructions. Large data and derived single-cell objects should live in object storage, not Git. In AWS, I would map the same steps to S3, ECR, AWS Batch or ECS, Step Functions, and CloudWatch logs.
+
+I would also build in fast test paths from the beginning: a tiny demo dataset, schema checks, CI-style structure checks, and one local Nextflow run. That way the pipeline is not just scientifically useful, it is also maintainable by the next person who inherits it.

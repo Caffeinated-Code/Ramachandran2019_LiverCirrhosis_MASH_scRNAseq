@@ -1,4 +1,4 @@
-# Run Notes And Self-Review
+# Run Notes And Quality Checks
 
 ## Local Runtime
 
@@ -33,7 +33,7 @@
 - Confirmed 20 primary human liver libraries were included.
 - Confirmed 5 healthy and 5 cirrhotic donors were represented after inclusion.
 - Checked required compartment recovery across disease states.
-- Reviewed UMAP and marker dot plot figures.
+- Checked UMAP and marker dot plot figures.
 - Corrected target scoring so curated macrophage genes do not borrow mesenchymal DE evidence.
 - Confirmed dashboard data files were generated.
 - Confirmed GSE244832 candidate-expression validation summaries were generated.
