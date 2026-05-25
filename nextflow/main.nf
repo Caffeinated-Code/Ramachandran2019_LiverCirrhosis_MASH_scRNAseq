@@ -42,6 +42,8 @@ process RUN_SEURAT_DISCOVERY {
   make check
   make curate
   make analyze
+  make refine-labels
+  make pseudobulk
   make prioritize
   make dashboard
   cp -R reports ${task.workDir}/reports
@@ -65,10 +67,13 @@ process PREPARE_VALIDATION {
   """
   cd ${projectDir}/..
   python3 scripts/prepare_validation_datasets.py
+  Rscript workflow/09_gse244832_hsc_validation.R --config ${params.config_yaml}
   mkdir -p ${task.workDir}/validation_tables
   cp reports/tables/validation_gse244832_candidate_expression_by_condition.csv ${task.workDir}/validation_tables/
   cp reports/tables/validation_gse244832_candidate_expression_by_cluster.csv ${task.workDir}/validation_tables/
   cp reports/tables/validation_gse244832_candidate_expression_by_sample.csv ${task.workDir}/validation_tables/
+  cp reports/tables/gse244832_hsc_like_cluster_scores.csv ${task.workDir}/validation_tables/
+  cp reports/tables/gse244832_hsc_candidate_validation.csv ${task.workDir}/validation_tables/
   cp reports/tables/validation_gse207310_readiness.csv ${task.workDir}/validation_tables/
   """
 }
@@ -84,15 +89,23 @@ process ENRICH_TARGET_EVIDENCE {
 
   output:
   path "target_public_evidence.csv"
+  path "target_translational_evidence.csv"
+  path "target_mouse_orthology.csv"
   path "ranked_biomarker_target_candidates_enriched.csv"
+  path "ranked_biomarker_target_candidates_translational.csv"
 
   script:
   """
   cd ${projectDir}/..
   python3 scripts/enrich_target_evidence.py
   Rscript -e "library(readr); library(dplyr); c <- read_csv('reports/tables/ranked_biomarker_target_candidates.csv', show_col_types=FALSE); e <- read_csv('reports/tables/target_public_evidence.csv', show_col_types=FALSE); write_csv(left_join(c, e, by='gene'), 'reports/tables/ranked_biomarker_target_candidates_enriched.csv')"
+  python3 scripts/enrich_translational_evidence.py
+  Rscript workflow/10_merge_translational_evidence.R --config ${params.config_yaml}
   cp reports/tables/target_public_evidence.csv ${task.workDir}/
+  cp reports/tables/target_translational_evidence.csv ${task.workDir}/
+  cp reports/tables/target_mouse_orthology.csv ${task.workDir}/
   cp reports/tables/ranked_biomarker_target_candidates_enriched.csv ${task.workDir}/
+  cp reports/tables/ranked_biomarker_target_candidates_translational.csv ${task.workDir}/
   """
 }
 

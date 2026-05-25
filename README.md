@@ -9,10 +9,11 @@ The primary analysis uses **GSE136103**, the Ramachandran et al. human cirrhosis
 For a fast review:
 
 1. [Interviewer guide](docs/interviewer_guide.md)
-2. [Executive summary](reports/executive_summary/README.md)
+2. [Concise Karyon submission summary](reports/karyon_submission_summary.md)
 3. [Translational ranked candidates](reports/tables/ranked_biomarker_target_candidates_translational.csv)
 4. [Marker validation figure](reports/figures/required_compartment_marker_dotplot.png)
-5. [Interactive dashboard](dashboard/README.md)
+5. [Requirement traceability](reports/requirement_traceability.md)
+6. [Interactive dashboard](dashboard/README.md)
 
 For implementation details:
 

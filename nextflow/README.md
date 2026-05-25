@@ -9,7 +9,7 @@ The local repository workflow remains the source of truth for the compact take-h
 - Run a small public demo dataset from GSE136103.
 - Run proprietary 10x-style liver scRNA-seq or snRNA-seq inputs.
 - Compare discovered candidates against prepared validation datasets.
-- Add public target evidence from Open Targets, ClinicalTrials.gov, and ClinVar.
+- Add public target evidence from Open Targets, ClinicalTrials.gov, ClinVar, UniProt, PubMed, and mouse orthology.
 
 ## Demo Run
 
@@ -71,7 +71,16 @@ Tracked compact validation outputs:
 - `reports/tables/validation_gse244832_candidate_expression_by_condition.csv`
 - `reports/tables/validation_gse244832_candidate_expression_by_cluster.csv`
 - `reports/tables/validation_gse244832_candidate_expression_by_sample.csv`
+- `reports/tables/gse244832_hsc_like_cluster_scores.csv`
+- `reports/tables/gse244832_hsc_candidate_validation.csv`
 - `reports/tables/validation_gse207310_readiness.csv`
+
+Tracked target evidence outputs:
+
+- `reports/tables/target_public_evidence.csv`
+- `reports/tables/target_translational_evidence.csv`
+- `reports/tables/target_mouse_orthology.csv`
+- `reports/tables/ranked_biomarker_target_candidates_translational.csv`
 
 ## Current Status
 

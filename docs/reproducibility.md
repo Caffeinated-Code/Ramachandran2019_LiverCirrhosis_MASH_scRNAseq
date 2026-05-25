@@ -29,9 +29,13 @@ make check
 make fetch-data
 make curate
 make analyze
+make refine-labels
+make pseudobulk
 make prioritize
 make validation
+make hsc-validation
 make evidence
+make translational-evidence
 make dashboard
 make report
 ```
@@ -73,4 +77,4 @@ Tracked manifests describe local validation data preparation:
 
 - Nextflow was not executed locally because Java was unavailable.
 - GSE207310 needs an Ensembl-to-symbol annotation module before symbol-level computed validation.
-- Donor-aware pseudobulk DE should replace exploratory cell-level DE for formal inference.
+- Full object-level GSE244832 reanalysis should run as a separate cloud job for production use.

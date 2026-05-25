@@ -5,6 +5,8 @@ This folder contains reviewable outputs, not core pipeline code.
 ## Narrative Outputs
 
 - `executive_summary/README.md`: concise scientific summary and interpretation
+- `karyon_submission_summary.md`: one-to-two page assignment submission summary
+- `requirement_traceability.md`: checklist mapping assignment requirements to repo evidence
 - `screening_responses/README.md`: written responses to the eight screening questions
 - `run_notes.md`: implementation notes, caveats, and improvement opportunities
 

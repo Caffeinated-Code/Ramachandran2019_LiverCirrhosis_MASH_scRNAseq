@@ -16,9 +16,9 @@ The repository is intentionally split into four layers:
 ## Suggested Review Path
 
 1. Start with [README.md](../README.md) for the project identity and key outputs.
-2. Read the [executive summary](../reports/executive_summary/README.md).
+2. Read the concise [Karyon submission summary](../reports/karyon_submission_summary.md).
 3. Inspect the ranked table:
-   - [ranked_biomarker_target_candidates_enriched.csv](../reports/tables/ranked_biomarker_target_candidates_enriched.csv)
+   - [ranked_biomarker_target_candidates_translational.csv](../reports/tables/ranked_biomarker_target_candidates_translational.csv)
 4. Review the marker validation figure:
    - [required_compartment_marker_dotplot.png](../reports/figures/required_compartment_marker_dotplot.png)
 5. Open the dashboard locally:
@@ -38,14 +38,13 @@ Rscript -e "shiny::runApp('dashboard')"
 - The workflow starts from GEO count matrices, not a hidden Seurat object.
 - Metadata curation explicitly excludes blood and mouse samples from the primary human liver analysis.
 - Required fibrosis-relevant compartments are marker-validated.
-- Differential expression is labeled as exploratory because cell-level tests can inflate confidence.
+- Donor-level pseudobulk DE is available and should be favored over exploratory cell-level DE.
 - Target prioritization separates biomarker value from therapeutic target plausibility.
 - Validation and public target evidence are modular and reproducible.
 - Large raw and derived data are excluded from Git; compact outputs are tracked for review.
 
 ## Known Limitations
 
-- Donor-aware pseudobulk DE is the most important next statistical improvement.
-- GSE244832 is prepared and summarized for candidate validation, but full object-level reanalysis is a future module.
+- GSE244832 is prepared and summarized for candidate validation, including focused HSC-like cluster validation; full object-level reanalysis is a future module.
 - GSE207310 is staged, but symbol-level computed validation still needs Ensembl-to-symbol annotation.
 - The Nextflow layer is a scaffold. Java was not available locally, so it was not executed on this machine.

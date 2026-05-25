@@ -60,15 +60,23 @@ Small, reviewable outputs:
 - `reports/tables/qc_by_library.csv`
 - `reports/tables/qc_filtered_by_library_compartment.csv`
 - `reports/tables/compartment_de_cell_level_exploratory.csv`
+- `reports/tables/pseudobulk_de_by_refined_state.csv`
+- `reports/tables/pseudobulk_priority_gene_de.csv`
 - `reports/tables/hallmark_pathway_enrichment.csv`
-- `reports/tables/ranked_biomarker_target_candidates_enriched.csv`
+- `reports/tables/ranked_biomarker_target_candidates_translational.csv`
 - `reports/tables/validation_gse244832_candidate_expression_by_condition.csv`
+- `reports/tables/gse244832_hsc_candidate_validation.csv`
+- `reports/tables/target_translational_evidence.csv`
+- `reports/tables/target_mouse_orthology.csv`
 
 Figures:
 
 - `reports/figures/umap_disease_state.png`
 - `reports/figures/umap_required_compartments.png`
+- `reports/figures/umap_refined_cell_states.png`
 - `reports/figures/required_compartment_marker_dotplot.png`
+- `reports/figures/pseudobulk_priority_gene_de.png`
+- `reports/figures/gse244832_hsc_validation_heatmap.png`
 - `reports/figures/ranked_candidate_scores.png`
 
 Dashboard:
