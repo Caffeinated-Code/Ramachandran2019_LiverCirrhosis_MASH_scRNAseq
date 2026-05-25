@@ -1,0 +1,19 @@
+{
+  "dataset": "GSE244832",
+  "format": "Matrix Market counts plus genes, cells, metadata CSV",
+  "local_dir": "data/validation/GSE244832",
+  "files": {
+    "counts": "hLIVER_counts.mtx.gz",
+    "genes": "hLIVER_genes.csv",
+    "cells": "hLIVER_cells.csv",
+    "metadata": "hLIVER_metadata.csv"
+  },
+  "n_genes": 27200,
+  "n_cells": 128223,
+  "conditions": [
+    "NAFL",
+    "NASH",
+    "NORMAL"
+  ],
+  "notes": "Large validation files are intentionally excluded from Git; compact candidate summaries are tracked."
+}

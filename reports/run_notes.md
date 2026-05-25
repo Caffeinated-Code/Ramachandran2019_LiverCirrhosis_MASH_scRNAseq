@@ -15,14 +15,15 @@
 - Excluded blood and mouse samples from the primary human liver discovery contrast.
 - Used marker-supported compartment calls for the required compartments rather than overclaiming full cell-type annotation.
 - Labeled Seurat cell-level DE as exploratory because donor-level pseudobulk is the better inferential strategy.
-- Kept validation modular. GSE244832 is prioritized for future HSC/MASH validation, GSE207310 supports SMOC2 translational evidence, and SCP2154 is a macrophage expansion path.
+- Kept validation modular. GSE244832 was prepared and summarized for HSC/MASH validation, GSE207310 was staged for biomarker directionality, and SCP2154 remains a macrophage expansion path.
+- Added public target evidence from Open Targets, ClinicalTrials.gov, ClinVar, and MyGene.info.
 
 ## Difficulties
 
 - Seurat was not installed initially. It was installed locally and verified before analysis.
 - Seurat v5 uses layered assays after merge. The workflow now calls `JoinLayers()` explicitly before marker scoring.
 - `renv` initially saw an empty project library. I hydrated it from the local R library and then wrote the lockfile.
-- Full validation with GSE244832 was not run locally because the processed archive is large and should be treated as a separate validation job. The pipeline is structured so that module can be added cleanly.
+- Full object-level validation with GSE244832 was not run locally because the count matrix is large. Instead, the prepared validation script streams the matrix and aggregates ranked candidate genes by condition, cluster, and sample.
 - The current DE is exploratory cell-level DE. A donor-aware pseudobulk module is the most important next improvement.
 
 ## Quality Checks Completed
@@ -34,6 +35,8 @@
 - Reviewed UMAP and marker dot plot figures.
 - Corrected target scoring so curated macrophage genes do not borrow mesenchymal DE evidence.
 - Confirmed dashboard data files were generated.
+- Confirmed GSE244832 candidate-expression validation summaries were generated.
+- Confirmed enriched candidate evidence table was generated.
 
 ## Highest-Value Improvements
 

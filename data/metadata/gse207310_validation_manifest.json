@@ -1,0 +1,7 @@
+{
+  "dataset": "GSE207310",
+  "format": "per-sample gzipped gene count text files using Ensembl IDs",
+  "local_dir": "data/validation/GSE207310",
+  "n_files": 30,
+  "notes": "Ready for biomarker validation after Ensembl-to-symbol annotation and phenotype mapping."
+}

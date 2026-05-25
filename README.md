@@ -10,9 +10,13 @@ The primary discovery dataset is **GSE136103**, the Ramachandran et al. human ci
 - Written screening responses: [reports/screening_responses/README.md](reports/screening_responses/README.md)
 - Biology primer: [docs/biology_primer_liver_fibrosis.docx](docs/biology_primer_liver_fibrosis.docx)
 - Ranked candidates: [reports/tables/ranked_biomarker_target_candidates.csv](reports/tables/ranked_biomarker_target_candidates.csv)
+- Enriched candidates with public target evidence: [reports/tables/ranked_biomarker_target_candidates_enriched.csv](reports/tables/ranked_biomarker_target_candidates_enriched.csv)
 - Pathway enrichment: [reports/tables/hallmark_pathway_enrichment.csv](reports/tables/hallmark_pathway_enrichment.csv)
 - Validation feasibility: [reports/tables/validation_dataset_feasibility.csv](reports/tables/validation_dataset_feasibility.csv)
+- Validation dataset preparation: [docs/validation_datasets.md](docs/validation_datasets.md)
+- Public target evidence notes: [docs/public_target_evidence.md](docs/public_target_evidence.md)
 - Interactive dashboard: [dashboard/app.R](dashboard/app.R)
+- Nextflow/AWS scaffold: [nextflow/README.md](nextflow/README.md)
 - AWS production notes: [docs/aws_production_notes.md](docs/aws_production_notes.md)
 
 ## Main Findings
@@ -40,6 +44,8 @@ make fetch-data
 make curate
 make analyze
 make prioritize
+make validation
+make evidence
 make dashboard
 make report
 ```
@@ -62,6 +68,8 @@ reports/                Figures, tables, executive summary, written responses
 dashboard/              Shiny dashboard and dashboard-ready data
 docs/                   Biology primer and AWS production notes
 data/metadata/          Small curated metadata manifests
+data/demo/              Tiny GSE136103-derived demo dataset
+nextflow/               Nextflow scaffold for local and AWS execution
 ```
 
 ## Validation Strategy
