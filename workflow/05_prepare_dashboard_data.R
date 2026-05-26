@@ -29,4 +29,8 @@ copy_if_exists(file.path(cfg$paths$tables_dir, "gse244832_hsc_candidate_validati
 copy_if_exists(file.path(cfg$paths$tables_dir, "refined_cluster_annotations.csv"), file.path(cfg$paths$dashboard_data_dir, "refined_cluster_annotations.csv"))
 copy_if_exists(file.path(cfg$paths$tables_dir, "hallmark_pathway_enrichment.csv"), file.path(cfg$paths$dashboard_data_dir, "pathway_enrichment.csv"))
 copy_if_exists(file.path(cfg$paths$tables_dir, "qc_filtered_by_library_compartment.csv"), file.path(cfg$paths$dashboard_data_dir, "qc_summary.csv"))
+copy_if_exists(file.path(cfg$paths$tables_dir, "target_prioritization_scoring_components.csv"), file.path(cfg$paths$dashboard_data_dir, "target_prioritization_scoring_components.csv"))
+copy_if_exists(file.path(cfg$paths$tables_dir, "target_prioritization_scoring_method.csv"), file.path(cfg$paths$dashboard_data_dir, "target_prioritization_scoring_method.csv"))
+copy_if_exists(file.path(cfg$paths$tables_dir, "gse136103_blood_candidate_marker_role_summary.csv"), file.path(cfg$paths$dashboard_data_dir, "gse136103_blood_candidate_marker_role_summary.csv"))
+copy_if_exists(file.path(cfg$paths$tables_dir, "gse136103_mouse_candidate_ortholog_summary.csv"), file.path(cfg$paths$dashboard_data_dir, "gse136103_mouse_candidate_ortholog_summary.csv"))
 message("Dashboard data prepared.")

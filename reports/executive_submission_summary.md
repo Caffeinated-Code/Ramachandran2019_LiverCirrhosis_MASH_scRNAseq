@@ -2,57 +2,95 @@
 
 ## Project
 
-**FibroTarget-Liver** is a compact, reproducible single-cell workflow for discovering and prioritizing cell-type-specific biomarkers and therapeutic target candidates in human liver fibrosis. The primary analysis uses **GSE136103**, a human liver cirrhosis scRNA-seq dataset, and validates selected candidates with **GSE244832**, a MASLD/MASH hepatic stellate cell-focused dataset. GSE207310 adds symbol-level bulk RNA-seq validation for SMOC2 and NAFLD/NASH biomarker directionality.
+**FibroTarget-Liver** is a reproducible single-cell workflow for human liver fibrosis, MASH, and cirrhosis target discovery. The primary analysis uses GSE136103 human liver count matrices, not a precomputed object. The published Ramachandran Seurat object is used only as a reference for annotation refinement.
 
-The repository is organized as an analysis pipeline with clear boundaries across `Makefile`, `renv.lock`, `Dockerfile`, `config/project.yaml`, `workflow/`, `scripts/`, `nextflow/`, `reports/`, and `dashboard/`. Raw data, large Seurat objects, validation matrices, private notes, and the assignment PDF are excluded from Git.
+The workflow moves from metadata curation to QC, Seurat preprocessing, marker-supported compartment annotation, donor-level pseudobulk differential expression, pathway analysis, target scoring, external validation, and translational interpretation.
 
 ## What Was Done
 
-The workflow starts from public GEO count matrices as the reproducible input. It curates GSE136103 metadata, excludes blood and mouse samples from the primary human liver contrast, builds Seurat objects, applies QC, normalizes, clusters, and generates UMAPs. Required disease-relevant compartments were recovered and marker-validated:
+Primary discovery uses human liver tissue only. Blood and mouse libraries are excluded from the main contrast to avoid tissue and species confounding, then analyzed separately as secondary validation checks.
 
-- **HSC/mesenchymal/myofibroblast-like cells:** COL1A1, COL3A1, ACTA2, TAGLN, PDGFRA, PDGFRB, LUM, DCN, RGS5
-- **Macrophage/monocyte populations:** TREM2, CD9, SPP1, GPNMB, LST1, C1QA, C1QB, C1QC
-- **Endothelial cells:** ACKR1, PLVAP, VWF, PECAM1, KDR, RAMP2, ENG
+The three required compartments were recovered:
 
-The published Ramachandran Seurat annotation object was then used as a reference layer. The workflow reads its `annotation_lineage` and `annotation_indepth` metadata and writes refined cluster labels while preserving GEO count matrices as the primary analysis input.
+- HSC/mesenchymal/myofibroblast-like cells: COL1A1, COL3A1, ACTA2, TAGLN, PDGFRA, PDGFRB, LUM, DCN, RGS5
+- Macrophage/monocyte cells: TREM2, CD9, SPP1, GPNMB, LST1, C1QA, C1QB, C1QC
+- Endothelial cells: ACKR1, PLVAP, VWF, PECAM1, KDR, RAMP2, ENG
 
-Differential expression is reported in two layers. Cell-level DE is kept as exploratory because cells are not independent biological replicates. Donor-level pseudobulk DE is the primary inferential layer and aggregates counts by donor and refined cell state before fitting limma models for cirrhotic versus healthy liver.
+Cell-level DE is retained as an exploratory screen. Donor-level pseudobulk DE is the main inferential layer because donor, not cell, is the biological replicate.
 
-Pathway analysis summarizes fibrosis-relevant mechanisms, including extracellular matrix remodeling, endothelial remodeling, coagulation/junction programs, hypoxia, glycolysis, lipid metabolism, and macrophage-associated inflammatory or repair states.
+## Main Interpretation
 
-## Candidate Prioritization
+Fibrosis signal is strongest in a connected scar niche:
 
-Candidate ranking uses a transparent rule-based score suited to the dataset size and donor structure. The score considers disease association, compartment specificity, donor-aware support, pathway support, external validation, protein modality, mouse conservation, tractability, and safety or specificity risk.
+- activated stromal and HSC/myofibroblast-like cells
+- scar-associated endothelial programs
+- macrophage injury and repair states
 
-The strongest near-term translational candidates fall into distinct use cases:
+The candidate list is intentionally split by use case:
 
-- **SMOC2:** secreted HSC-associated biomarker candidate. Stronger as a diagnostic or pharmacodynamic marker before direct target nomination.
-- **TIMP1:** secreted fibrosis and matrix-remodeling biomarker. Useful for pharmacodynamic monitoring, but broad injury biology limits specificity.
-- **PDGFRA/PDGFRB:** druggable HSC/pericyte signaling axis with therapeutic plausibility. Safety-window and tissue-specific delivery questions are central.
-- **PLVAP/ACKR1:** scar-associated endothelial markers. Strong vascular niche candidates; intervention requires caution because of vascular and immune-trafficking biology.
-- **COL1A1/COL3A1:** excellent fibrosis burden and pharmacodynamic endpoints, but poor direct therapeutic targets because collagen biology is essential for normal tissue repair.
-- **TREM2/CD9/SPP1/GPNMB:** macrophage-state candidates. These are important for disease-state validation and mechanism studies, but require macrophage-focused external validation before target nomination.
+- Diagnostic and pharmacodynamic biomarkers: SMOC2, TIMP1, COL1A1, COL3A1, PLVAP, ACKR1
+- Therapeutic hypotheses: PDGFRA, PDGFRB
+- Future validation markers: TREM2, SPP1, GPNMB, CD9
 
-## Validation And Translational Evidence
+The key point is that a strong fibrosis marker is not automatically a strong therapeutic target. Collagens are excellent burden readouts but poor direct targets. PDGFRA/B are more druggable, but safety and tissue selectivity are central. Macrophage candidates are biologically compelling but need macrophage-focused validation before nomination.
 
-GSE244832 was selected as the first validation dataset because it is human, MASLD/MASH-focused, and centered on HSC activation. The local module streams candidate summaries from the processed matrix, identifies HSC-like clusters using stromal and myofibroblast markers, and evaluates SMOC2, TIMP1, COL1A1, COL3A1, PDGFRA, and PDGFRB across NORMAL, NAFL, and NASH labels.
+## Prioritization
 
-Key validation signal: SMOC2, TIMP1, PDGFRA, and PDGFRB show higher expression in HSC-like NASH clusters than normal HSC-like clusters. COL1A1 and COL3A1 remain strong fibrosis burden markers, but the validation pattern supports using them as endpoints rather than direct targets.
+The scoring model now uses component-level evidence:
 
-Public evidence enrichment adds UniProt localization and tissue comments, PubMed perturbation/safety signal, ClinicalTrials.gov context, Open Targets tractability/safety annotations, ClinVar counts, and mouse orthology through `babelgene`. These are triage layers, not proof of causality.
+- disease association
+- donor-level pseudobulk support
+- compartment specificity
+- pathway coherence
+- external validation
+- modality and assayability
+- mouse conservation
+- safety and specificity penalties
+- blood specificity penalty
+- therapeutic risk penalty
+
+Scoring tables:
+
+- `reports/tables/ranked_biomarker_target_candidates_translational.csv`
+- `reports/tables/target_prioritization_scoring_components.csv`
+- `reports/tables/target_prioritization_scoring_method.csv`
+
+## Validation
+
+Validation layers:
+
+- GSE244832: MASH/MASLD HSC-focused validation
+- GSE207310: bulk NAFLD/NASH directionality
+- GSE136103 blood: circulating marker specificity
+- GSE136103 mouse liver: ortholog conservation and preclinical directionality
+
+Blood supports tissue-niche specificity for most stromal, endothelial, and collagen candidates. Mouse fibrotic liver shows the strongest directionality for macrophage-state orthologs, with weaker stromal support in the small two-sample screen.
+
+## What Went Beyond The Assignment
+
+Kept modest:
+
+- Interactive Shiny dashboard
+- Standalone Nextflow demo that runs locally
+- AWS-ready Nextflow pattern using the same demo contract
 
 ## What To Open
 
-- Main README: `README.md`
-- Written screening responses: `reports/screening_responses/README.md`
-- Requirement traceability: `reports/requirement_traceability.md`
-- Ranked translational candidates: `reports/tables/ranked_biomarker_target_candidates_translational.csv`
-- Donor-level pseudobulk support: `reports/tables/pseudobulk_priority_gene_de.csv`
-- GSE244832 HSC validation: `reports/tables/gse244832_hsc_candidate_validation.csv`
-- Interactive dashboard: `Rscript -e "shiny::runApp('dashboard')"`
+- `docs/analysis_walkthrough.md`
+- `reports/executive_submission_summary.html`
+- `reports/screening_responses/README.md`
+- `reports/requirement_traceability.md`
+- `reports/tables/ranked_biomarker_target_candidates_translational.csv`
+- `dashboard/app.R`
+- `nextflow/fibrotarget_demo/README.md`
 
-## Limitations And Next Steps
+## Next Steps
 
-The compact workflow is designed to show scientific judgment and execution. Macrophage candidates need an additional macrophage-focused atlas such as SCP2154 or another accessible fibrosis atlas. PLVAP, ACKR1, SMOC2, TIMP1, and collagen candidates should be validated with spatial transcriptomics, immunostaining, or proteomics to confirm scar-niche localization. PDGFRA/B target nomination should move next into perturbation assays such as HSC spheroids, co-culture, or precision-cut liver slices.
+The next decisive work is not more ranking. It is validation:
 
-No clarifying questions remain for the submitted compact assignment.
+- spatial localization for SMOC2, TIMP1, PLVAP, ACKR1, PDGFRA/B, and macrophage-state markers
+- full GSE244832 all-gene object reanalysis on AWS
+- macrophage-focused external atlas validation
+- pathfindR or ReactomePA active mechanism module
+- LIANA/NicheNet/CellChat communication analysis with spatial and perturbation support
+- HSC perturbation assays for PDGFRA/B

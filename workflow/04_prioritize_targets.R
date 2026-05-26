@@ -4,6 +4,7 @@ suppressPackageStartupMessages({
   library(readr)
   library(ggplot2)
   library(msigdbr)
+  library(tidyr)
 })
 
 source("src/R/utils.R")
@@ -15,34 +16,79 @@ get_arg <- function(flag, default = NULL) {
 }
 
 cfg <- yaml::read_yaml(get_arg("--config", "config/project.yaml"))
-de_path <- file.path(cfg$paths$tables_dir, "compartment_de_cell_level_exploratory.csv")
+tables_dir <- cfg$paths$tables_dir
+de_path <- file.path(tables_dir, "compartment_de_cell_level_exploratory.csv")
 if (!file.exists(de_path)) stop("Missing DE results. Run make analyze first.")
 de <- read_csv(de_path, show_col_types = FALSE)
+pseudobulk_path <- file.path(tables_dir, "pseudobulk_priority_gene_de.csv")
+pseudobulk <- if (file.exists(pseudobulk_path)) read_csv(pseudobulk_path, show_col_types = FALSE) else tibble()
+gse244_path <- file.path(tables_dir, "gse244832_focused_object_candidate_summary.csv")
+gse244 <- if (file.exists(gse244_path)) read_csv(gse244_path, show_col_types = FALSE) else tibble()
+gse207_path <- file.path(tables_dir, "validation_gse207310_candidate_lm_results.csv")
+gse207 <- if (file.exists(gse207_path)) read_csv(gse207_path, show_col_types = FALSE) else tibble()
+blood_path <- file.path(tables_dir, "gse136103_blood_candidate_marker_role_summary.csv")
+blood <- if (file.exists(blood_path)) read_csv(blood_path, show_col_types = FALSE) else tibble()
+mouse_path <- file.path(tables_dir, "gse136103_mouse_candidate_ortholog_summary.csv")
+mouse <- if (file.exists(mouse_path)) read_csv(mouse_path, show_col_types = FALSE) else tibble()
+blood_detected_high <- if (nrow(blood) > 0) blood$gene[blood$mean_pct_detected >= 20] else character()
+blood_allowed_context <- c("TIMP1", "LST1", "C1QA", "C1QB", "C1QC")
 
 manual_evidence <- tibble::tribble(
-  ~gene, ~intended_compartment, ~literature_context, ~translational_modality, ~model_conservation, ~risk_note, ~candidate_class,
-  "TREM2", "macrophage_monocyte", "Scar-associated macrophage marker reported in human cirrhosis; also appears in MASH biomarker literature.", "surface receptor; biomarker and target biology", "mouse ortholog supports preclinical macrophage studies", "macrophage biology is context-dependent; target effect may not be liver-specific", "pharmacodynamic biomarker",
-  "CD9", "macrophage_monocyte", "Reported with TREM2 in scar-associated macrophages.", "surface protein; cell-state biomarker", "conserved", "broad expression limits target specificity", "pharmacodynamic biomarker",
-  "SPP1", "macrophage_monocyte", "Osteopontin is linked to inflammatory macrophage and fibrotic tissue programs.", "secreted protein", "conserved", "pleiotropic inflammatory biology", "mechanistic marker",
-  "GPNMB", "macrophage_monocyte", "Disease-associated macrophage/repair-state marker in chronic tissue injury.", "surface/secreted-associated protein", "conserved", "not liver-specific", "pharmacodynamic biomarker",
-  "PLVAP", "endothelial", "Reported scar-associated endothelial marker in human cirrhosis.", "surface-associated endothelial marker", "conserved", "vascular biology may create safety considerations", "diagnostic biomarker",
-  "ACKR1", "endothelial", "Reported scar-associated endothelial marker in human cirrhosis.", "surface atypical chemokine receptor", "conserved with species differences", "vascular and immune trafficking roles require caution", "mechanistic marker",
-  "VWF", "endothelial", "Endothelial activation and vascular remodeling marker.", "secreted/endothelial biomarker", "conserved", "broad vascular expression", "diagnostic biomarker",
-  "COL1A1", "mesenchymal_HSC_myofibroblast", "Core collagen scar component.", "matrix biomarker", "conserved", "excellent fibrosis readout but poor direct target", "diagnostic biomarker",
-  "COL3A1", "mesenchymal_HSC_myofibroblast", "Core collagen scar component.", "matrix biomarker", "conserved", "excellent fibrosis readout but poor direct target", "diagnostic biomarker",
-  "ACTA2", "mesenchymal_HSC_myofibroblast", "Activated myofibroblast marker.", "cell-state marker", "conserved", "smooth muscle expression limits specificity", "pharmacodynamic biomarker",
-  "PDGFRB", "mesenchymal_HSC_myofibroblast", "Stellate/pericyte activation and fibrogenic signaling axis.", "surface receptor; druggable class", "conserved", "vascular/pericyte roles create safety considerations", "therapeutic target",
-  "PDGFRA", "mesenchymal_HSC_myofibroblast", "Mesenchymal activation marker and receptor tyrosine kinase.", "surface receptor; druggable class", "conserved", "broad mesenchymal biology", "therapeutic target",
-  "LUM", "mesenchymal_HSC_myofibroblast", "Matrix-associated stromal marker.", "matrix biomarker", "conserved", "matrix marker more than direct intervention point", "diagnostic biomarker",
-  "DCN", "mesenchymal_HSC_myofibroblast", "Matrix proteoglycan expressed by stromal populations.", "matrix biomarker", "conserved", "context-dependent anti/pro-fibrotic roles", "mechanistic marker",
-  "RGS5", "mesenchymal_HSC_myofibroblast", "Pericyte/activated mesenchymal marker.", "cell-state marker", "conserved", "vascular mural cell expression", "mechanistic marker",
-  "SMOC2", "mesenchymal_HSC_myofibroblast", "Reported HSC-derived secreted biomarker associated with human NAFLD/NASH severity.", "secreted biomarker", "conserved", "best positioned as biomarker before target", "diagnostic biomarker",
-  "TIMP1", "mesenchymal_HSC_myofibroblast", "Matrix remodeling inhibitor frequently elevated in fibrosis.", "secreted biomarker", "conserved", "broad injury response", "pharmacodynamic biomarker",
-  "LOXL2", "mesenchymal_HSC_myofibroblast", "Collagen crosslinking enzyme and fibrotic matrix remodeling candidate.", "secreted/enzyme; druggable class", "conserved", "prior clinical fibrosis targeting has been challenging", "therapeutic target",
-  "SERPINE1", "mesenchymal_HSC_myofibroblast", "TGF-beta-linked matrix remodeling and injury-response mediator.", "secreted inhibitor", "conserved", "broad coagulation/fibrinolysis biology", "mechanistic marker",
-  "MMP2", "mesenchymal_HSC_myofibroblast", "Matrix remodeling enzyme associated with activated stromal biology.", "secreted/enzyme", "conserved", "matrix remodeling can be protective or harmful by context", "mechanistic marker",
-  "THY1", "mesenchymal_HSC_myofibroblast", "Activated mesenchymal and portal fibroblast-associated marker.", "surface marker", "conserved", "broad stromal expression", "pharmacodynamic biomarker"
+  ~gene, ~intended_compartment, ~literature_context, ~translational_modality, ~model_conservation, ~risk_note, ~candidate_class, ~clinical_use_case,
+  "TREM2", "macrophage_monocyte", "Scar-associated macrophage marker reported in human cirrhosis; useful for macrophage-state biology.", "surface receptor; biomarker and target biology", "mouse ortholog supports preclinical macrophage studies", "macrophage biology can be protective or pathogenic depending on disease timing", "future validation marker", "macrophage state stratification and perturbation studies",
+  "CD9", "macrophage_monocyte", "Reported with TREM2 in scar-associated macrophages.", "surface protein; cell-state biomarker", "conserved", "broad tetraspanin expression limits target specificity", "pharmacodynamic biomarker", "scar-associated macrophage pharmacodynamic readout",
+  "SPP1", "macrophage_monocyte", "Osteopontin is linked to inflammatory macrophage and fibrotic tissue programs.", "secreted protein", "conserved", "pleiotropic inflammatory, cancer, and repair biology", "future validation marker", "macrophage-to-stromal mechanism follow-up",
+  "GPNMB", "macrophage_monocyte", "Disease-associated macrophage and repair-state marker in chronic tissue injury.", "surface/secreted-associated protein", "conserved", "not liver-specific", "pharmacodynamic biomarker", "macrophage injury-state readout",
+  "PLVAP", "endothelial", "Reported scar-associated endothelial marker in human cirrhosis.", "surface-associated endothelial marker", "conserved", "vascular biology raises safety considerations for intervention", "diagnostic biomarker", "scar-associated vascular niche readout",
+  "ACKR1", "endothelial", "Reported scar-associated endothelial marker in human cirrhosis.", "surface atypical chemokine receptor", "conserved with species differences", "vascular and immune-trafficking roles require caution", "future validation marker", "spatial vascular and immune trafficking validation",
+  "VWF", "endothelial", "Endothelial activation and vascular remodeling marker.", "secreted/endothelial biomarker", "conserved", "broad vascular expression", "diagnostic biomarker", "endothelial activation context marker",
+  "COL1A1", "mesenchymal_HSC_myofibroblast", "Core collagen scar component.", "matrix biomarker", "conserved", "excellent fibrosis readout but poor direct target", "diagnostic biomarker", "fibrosis burden and pharmacodynamic endpoint",
+  "COL3A1", "mesenchymal_HSC_myofibroblast", "Core collagen scar component.", "matrix biomarker", "conserved", "excellent fibrosis readout but poor direct target", "diagnostic biomarker", "fibrosis burden and pharmacodynamic endpoint",
+  "ACTA2", "mesenchymal_HSC_myofibroblast", "Activated myofibroblast marker.", "cell-state marker", "conserved", "smooth muscle expression limits specificity", "pharmacodynamic biomarker", "activated stromal-state readout",
+  "PDGFRB", "mesenchymal_HSC_myofibroblast", "Stellate/pericyte activation and fibrogenic signaling axis.", "surface receptor; druggable class", "conserved", "vascular and pericyte roles create on-target safety concerns", "therapeutic target", "stromal activation perturbation hypothesis",
+  "PDGFRA", "mesenchymal_HSC_myofibroblast", "Mesenchymal activation marker and receptor tyrosine kinase.", "surface receptor; druggable class", "conserved", "broad mesenchymal biology", "therapeutic target", "stromal activation perturbation hypothesis",
+  "LUM", "mesenchymal_HSC_myofibroblast", "Matrix-associated stromal marker.", "matrix biomarker", "conserved", "matrix marker more than direct intervention point", "diagnostic biomarker", "stromal matrix burden marker",
+  "DCN", "mesenchymal_HSC_myofibroblast", "Matrix proteoglycan expressed by stromal populations.", "matrix biomarker", "conserved", "context-dependent anti-fibrotic and pro-remodeling roles", "future validation marker", "matrix biology validation",
+  "RGS5", "mesenchymal_HSC_myofibroblast", "Pericyte and activated mesenchymal marker.", "cell-state marker", "conserved", "vascular mural cell expression", "future validation marker", "pericyte and stromal-state validation",
+  "SMOC2", "mesenchymal_HSC_myofibroblast", "Reported HSC-derived secreted biomarker associated with human NAFLD/NASH severity.", "secreted biomarker", "conserved", "best positioned as biomarker before target", "diagnostic biomarker", "secreted diagnostic or pharmacodynamic marker",
+  "TIMP1", "mesenchymal_HSC_myofibroblast", "Matrix remodeling inhibitor frequently elevated in fibrosis.", "secreted biomarker", "conserved", "broad injury response", "pharmacodynamic biomarker", "secreted pharmacodynamic marker with specificity caveat",
+  "LOXL2", "mesenchymal_HSC_myofibroblast", "Collagen crosslinking enzyme and fibrotic matrix remodeling candidate.", "secreted/enzyme; druggable class", "conserved", "prior clinical fibrosis targeting has been challenging", "therapeutic target", "matrix stiffness target hypothesis with clinical-risk flag",
+  "SERPINE1", "mesenchymal_HSC_myofibroblast", "TGF-beta-linked matrix remodeling and injury-response mediator.", "secreted inhibitor", "conserved", "broad coagulation and fibrinolysis biology", "future validation marker", "TGF-beta-linked injury mechanism",
+  "MMP2", "mesenchymal_HSC_myofibroblast", "Matrix remodeling enzyme associated with activated stromal biology.", "secreted/enzyme", "conserved", "matrix remodeling can be protective or harmful by context", "future validation marker", "matrix remodeling mechanism",
+  "THY1", "mesenchymal_HSC_myofibroblast", "Activated mesenchymal and portal fibroblast-associated marker.", "surface marker", "conserved", "broad stromal expression", "pharmacodynamic biomarker", "activated stromal and portal-fibroblast-like readout"
 )
+
+score_cap <- function(x, cap) pmin(cap, pmax(0, x))
+
+pseudobulk_support <- pseudobulk |>
+  filter(gene %in% manual_evidence$gene) |>
+  left_join(manual_evidence |> select(gene, intended_compartment), by = "gene") |>
+  mutate(
+    pseudobulk_compartment = case_when(
+      grepl("HSC|Mesenchymal|myofibroblast|Stellate|Fibroblast", refined_cell_state, ignore.case = TRUE) ~ "mesenchymal_HSC_myofibroblast",
+      grepl("Macrophage|Monocyte", refined_cell_state, ignore.case = TRUE) ~ "macrophage_monocyte",
+      grepl("Endothelial", refined_cell_state, ignore.case = TRUE) ~ "endothelial",
+      TRUE ~ refined_cell_state
+    ),
+    donor_points = if_else(
+      pseudobulk_compartment == intended_compartment,
+      score_cap((log2FC > 0) * (abs(log2FC) * 4 + -log10(pmax(p_adj, 1e-300)) / 3), 18),
+      0
+    )
+  ) |>
+  group_by(gene) |>
+  arrange(desc(donor_points), .by_group = TRUE) |>
+  slice_head(n = 1) |>
+  ungroup() |>
+  transmute(
+    gene,
+    pseudobulk_cell_state = refined_cell_state,
+    pseudobulk_log2FC = log2FC,
+    pseudobulk_p_adj = p_adj,
+    n_healthy_donors,
+    n_cirrhotic_donors,
+    donor_consistency_points = donor_points
+  )
 
 de_ranked <- de |>
   mutate(
@@ -75,39 +121,101 @@ candidate_base <- de_ranked |>
     p_val_adj = coalesce(p_val_adj, 1),
     pct.1 = coalesce(pct.1, 0),
     pct.2 = coalesce(pct.2, 0),
-    disease_points = coalesce(disease_points, 0),
+    disease_points = coalesce(disease_points, 0)
+  ) |>
+  left_join(pseudobulk_support, by = "gene") |>
+  mutate(
+    cell_level_disease_points = disease_points,
     specificity_points = coalesce(specificity_points, 0),
+    donor_consistency_points = coalesce(donor_consistency_points, 0),
+    disease_association_points = pmax(cell_level_disease_points, donor_consistency_points),
     pathway_points = case_when(
-      gene %in% c("COL1A1", "COL3A1", "ACTA2", "PDGFRB", "PDGFRA", "TIMP1", "LOXL2", "SERPINE1", "MMP2") ~ 15,
-      gene %in% c("TREM2", "CD9", "SPP1", "GPNMB", "PLVAP", "ACKR1") ~ 12,
-      TRUE ~ 8
+      gene %in% c("COL1A1", "COL3A1", "ACTA2", "PDGFRB", "PDGFRA", "TIMP1", "LOXL2", "SERPINE1", "MMP2", "SMOC2", "LUM", "DCN") ~ 14,
+      gene %in% c("TREM2", "CD9", "SPP1", "GPNMB", "PLVAP", "ACKR1", "VWF") ~ 12,
+      TRUE ~ 7
     ),
-    validation_points = case_when(
-      gene %in% c("SMOC2", "TREM2", "PLVAP", "ACKR1", "COL1A1", "COL3A1", "PDGFRB", "ACTA2") ~ 15,
-      gene %in% c("SPP1", "GPNMB", "TIMP1", "LOXL2") ~ 10,
-      TRUE ~ 5
+    gse244_points = case_when(
+      nrow(gse244) == 0 ~ 0,
+      gene %in% gse244$gene[gse244$nash_vs_normal_delta > 0.1] ~ 8,
+      gene %in% gse244$gene ~ 4,
+      TRUE ~ 0
     ),
+    gse207_points = case_when(
+      nrow(gse207) == 0 ~ 0,
+      gene %in% gse207$gene[gse207$log2FC_NASH_vs_NAFL > 0] ~ 5,
+      gene %in% gse207$gene ~ 2,
+      TRUE ~ 0
+    ),
+    mouse_points = case_when(
+      nrow(mouse) == 0 ~ 0,
+      gene %in% mouse$human_gene[mouse$fibrotic_vs_healthy_delta > 0.25] ~ 5,
+      gene %in% mouse$human_gene[mouse$fibrotic_vs_healthy_delta > 0] ~ 3,
+      gene %in% mouse$human_gene ~ 1,
+      TRUE ~ 0
+    ),
+    blood_specificity_penalty = case_when(
+      nrow(blood) == 0 ~ 0,
+      gene %in% setdiff(blood_detected_high, blood_allowed_context) ~ -5,
+      gene %in% blood_detected_high ~ -2,
+      TRUE ~ 0
+    ),
+    external_validation_points = score_cap(gse244_points + gse207_points + mouse_points, 18),
     modality_points = case_when(
       grepl("surface|secreted|enzyme|receptor|druggable", translational_modality) ~ 10,
-      TRUE ~ 5
+      grepl("matrix biomarker", translational_modality) ~ 6,
+      TRUE ~ 4
     ),
-    conservation_points = if_else(grepl("conserved|ortholog", model_conservation), 5, 2),
+    conservation_points = if_else(grepl("conserved|ortholog", model_conservation), 6, 2),
     safety_penalty = case_when(
-      grepl("broad|pleiotropic|safety|not liver-specific", risk_note) ~ -6,
       grepl("poor direct target", risk_note) ~ -8,
+      grepl("broad|pleiotropic|safety|not liver-specific|vascular|pericyte|coagulation|smooth muscle", risk_note) ~ -6,
       TRUE ~ -2
     ),
-    total_score = disease_points + specificity_points + pathway_points + validation_points +
-      modality_points + conservation_points + safety_penalty
+    therapeutic_penalty = case_when(
+      candidate_class == "therapeutic target" & grepl("prior clinical|broad|vascular|pericyte", risk_note) ~ -4,
+      candidate_class == "diagnostic biomarker" & grepl("broad injury", risk_note) ~ -3,
+      TRUE ~ 0
+    ),
+    total_score = disease_association_points + specificity_points + donor_consistency_points +
+      pathway_points + external_validation_points + modality_points + conservation_points +
+      safety_penalty + blood_specificity_penalty + therapeutic_penalty
   ) |>
   arrange(desc(total_score)) |>
   mutate(rank = row_number()) |>
   select(
-    rank, gene, compartment, candidate_class, total_score, avg_log2FC, p_val_adj, pct.1, pct.2,
+    rank, gene, compartment, candidate_class, clinical_use_case, total_score,
+    disease_association_points, donor_consistency_points, specificity_points, pathway_points,
+    external_validation_points, modality_points, conservation_points, safety_penalty,
+    blood_specificity_penalty, therapeutic_penalty, avg_log2FC, p_val_adj, pct.1, pct.2,
+    pseudobulk_cell_state, pseudobulk_log2FC, pseudobulk_p_adj, n_healthy_donors, n_cirrhotic_donors,
     translational_modality, model_conservation, literature_context, risk_note
   )
 
 safe_write(candidate_base, file.path(cfg$paths$tables_dir, "ranked_biomarker_target_candidates.csv"))
+
+score_components <- candidate_base |>
+  select(
+    rank, gene, candidate_class, clinical_use_case, total_score,
+    disease_association_points, donor_consistency_points, specificity_points,
+    pathway_points, external_validation_points, modality_points, conservation_points,
+    safety_penalty, blood_specificity_penalty, therapeutic_penalty, risk_note
+  )
+safe_write(score_components, file.path(cfg$paths$tables_dir, "target_prioritization_scoring_components.csv"))
+
+score_method <- tibble::tribble(
+  ~component, ~direction, ~max_points, ~rationale,
+  "disease_association_points", "positive", 20, "Rewards cirrhosis-up genes with meaningful effect size and adjusted significance, using donor-aware support when available.",
+  "donor_consistency_points", "positive", 18, "Rewards signals that survive donor-level pseudobulk rather than only cell-level testing.",
+  "specificity_points", "positive", 15, "Rewards a higher fraction of expressing cells in cirrhotic versus healthy cells inside the intended compartment.",
+  "pathway_points", "positive", 14, "Rewards genes coherent with fibrosis mechanisms such as matrix remodeling, PDGF signaling, scar endothelium, or macrophage injury states.",
+  "external_validation_points", "positive", 18, "Rewards directionality in GSE244832, GSE207310, and mouse ortholog checks.",
+  "modality_points", "positive", 10, "Rewards secreted, surface, receptor, enzyme, or otherwise assayable proteins.",
+  "conservation_points", "positive", 6, "Rewards human-to-mouse orthology for preclinical feasibility.",
+  "safety_penalty", "negative", -8, "Penalizes broad tissue expression, vascular or immune safety risk, pleiotropy, and direct targeting of structural matrix proteins.",
+  "blood_specificity_penalty", "negative", -5, "Penalizes broad blood detectability unless the intended use is circulating injury or immune context.",
+  "therapeutic_penalty", "negative", -4, "Penalizes therapeutic hypotheses with known clinical or on-target safety concerns."
+)
+safe_write(score_method, file.path(cfg$paths$tables_dir, "target_prioritization_scoring_method.csv"))
 
 genesets <- msigdbr(species = "Homo sapiens", collection = "H") |>
   select(gs_name, gene_symbol)

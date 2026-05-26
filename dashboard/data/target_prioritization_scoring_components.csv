@@ -1,0 +1,22 @@
+rank,gene,candidate_class,clinical_use_case,total_score,disease_association_points,donor_consistency_points,specificity_points,pathway_points,external_validation_points,modality_points,conservation_points,safety_penalty,blood_specificity_penalty,therapeutic_penalty,risk_note
+1,COL1A1,diagnostic biomarker,fibrosis burden and pharmacodynamic endpoint,78.45,20,18,6.45,14,16,6,6,-8,0,0,excellent fibrosis readout but poor direct target
+2,TIMP1,pharmacodynamic biomarker,secreted pharmacodynamic marker with specificity caveat,77.3887327317836,20,13.808732731783609,5.58,14,16,10,6,-6,-2,0,broad injury response
+3,ACKR1,future validation marker,spatial vascular and immune trafficking validation,76.38,20,18,4.38,12,12,10,6,-6,0,0,vascular and immune-trafficking roles require caution
+4,COL3A1,diagnostic biomarker,fibrosis burden and pharmacodynamic endpoint,75.88934314154638,20,15.409343141546382,6.479999999999999,14,16,6,6,-8,0,0,excellent fibrosis readout but poor direct target
+5,SPP1,future validation marker,macrophage-to-stromal mechanism follow-up,75.78597320876713,20,12.725973208767133,3.06,12,18,10,6,-6,0,0,"pleiotropic inflammatory, cancer, and repair biology"
+6,PDGFRA,therapeutic target,stromal activation perturbation hypothesis,75.73739657697844,20,15.71739657697844,4.02,14,16,10,6,-6,0,-4,broad mesenchymal biology
+7,PLVAP,diagnostic biomarker,scar-associated vascular niche readout,67.01708167102439,20,3.6770816710243808,5.34,12,16,10,6,-6,0,0,vascular biology raises safety considerations for intervention
+8,CD9,pharmacodynamic biomarker,scar-associated macrophage pharmacodynamic readout,65.81112053083551,18.41256017798649,5.358560352849022,2.0399999999999996,12,18,10,6,-6,0,0,broad tetraspanin expression limits target specificity
+9,TREM2,future validation marker,macrophage state stratification and perturbation studies,57.60562059195723,8.802810295978619,8.802810295978619,0,12,14,10,6,-2,0,0,macrophage biology can be protective or pathogenic depending on disease timing
+10,MMP2,future validation marker,matrix remodeling mechanism,51.69,20,0,3.6900000000000004,14,0,10,6,-2,0,0,matrix remodeling can be protective or harmful by context
+11,DCN,future validation marker,matrix biology validation,49.79,20,0,5.789999999999999,14,0,6,6,-2,0,0,context-dependent anti-fibrotic and pro-remodeling roles
+12,VWF,diagnostic biomarker,endothelial activation context marker,49.425,20,0,7.425000000000001,12,0,10,6,-6,0,0,broad vascular expression
+13,LUM,diagnostic biomarker,stromal matrix burden marker,48.394999999999996,20,0,4.3950000000000005,14,0,6,6,-2,0,0,matrix marker more than direct intervention point
+14,SMOC2,diagnostic biomarker,secreted diagnostic or pharmacodynamic marker,47.58815455997629,1.6745516836947199,0.38360287628156814,1.5299999999999998,14,16,10,6,-2,0,0,best positioned as biomarker before target
+15,THY1,pharmacodynamic biomarker,activated stromal and portal-fibroblast-like readout,42.28,20,0,5.28,7,0,10,6,-6,0,0,broad stromal expression
+16,GPNMB,pharmacodynamic biomarker,macrophage injury-state readout,41.89424346014124,0.947121730070622,0.947121730070622,0,12,18,10,6,-6,0,0,not liver-specific
+17,PDGFRB,therapeutic target,stromal activation perturbation hypothesis,38.57278384892737,0.8627838489273754,0,1.71,14,16,10,6,-6,0,-4,vascular and pericyte roles create on-target safety concerns
+18,SERPINE1,future validation marker,TGF-beta-linked injury mechanism,33.04665976778811,7.786659767788108,0,1.26,14,0,10,6,-6,0,0,broad coagulation and fibrinolysis biology
+19,LOXL2,therapeutic target,matrix stiffness target hypothesis with clinical-risk flag,24,0,0,0,14,0,10,6,-2,0,-4,prior clinical fibrosis targeting has been challenging
+20,ACTA2,pharmacodynamic biomarker,activated stromal-state readout,23.295684493761037,4.065684493761039,0,1.2299999999999995,14,0,4,6,-6,0,0,smooth muscle expression limits specificity
+21,RGS5,future validation marker,pericyte and stromal-state validation,18.806886745004732,5.1968867450047345,0,2.61,7,0,4,6,-6,0,0,vascular mural cell expression

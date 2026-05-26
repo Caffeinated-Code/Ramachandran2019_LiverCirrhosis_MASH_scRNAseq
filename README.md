@@ -9,11 +9,13 @@ The primary analysis uses **GSE136103**, the Ramachandran et al. human cirrhosis
 Start here:
 
 1. [Project navigation](docs/project_navigation.md)
-2. [Rendered executive submission summary](reports/executive_submission_summary.html)
-3. [Translational ranked candidates](reports/tables/ranked_biomarker_target_candidates_translational.csv)
-4. [Marker validation figure](reports/figures/required_compartment_marker_dotplot.png)
-5. [Requirement traceability](reports/requirement_traceability.md)
-6. [Interactive dashboard](dashboard/README.md)
+2. [Analysis walkthrough](docs/analysis_walkthrough.md)
+3. [Rendered executive submission summary](reports/executive_submission_summary.html)
+4. [Translational ranked candidates](reports/tables/ranked_biomarker_target_candidates_translational.csv)
+5. [Scoring components](reports/tables/target_prioritization_scoring_components.csv)
+6. [Marker validation figure](reports/figures/required_compartment_marker_dotplot.png)
+7. [Requirement traceability](reports/requirement_traceability.md)
+8. [Interactive dashboard](dashboard/README.md)
 
 For implementation details:
 

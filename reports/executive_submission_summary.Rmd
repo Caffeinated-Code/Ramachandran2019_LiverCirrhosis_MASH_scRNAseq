@@ -24,6 +24,7 @@ tables <- file.path(root, "reports", "tables")
 figures <- file.path(root, "reports", "figures")
 read_table <- function(name) readr::read_csv(file.path(tables, name), show_col_types = FALSE)
 candidate <- read_table("ranked_biomarker_target_candidates_translational.csv")
+score_method <- read_table("target_prioritization_scoring_method.csv")
 pseudobulk <- read_table("pseudobulk_priority_gene_de.csv")
 pathways <- read_table("hallmark_pathway_enrichment.csv")
 gse244 <- read_table("gse244832_focused_object_candidate_summary.csv")
@@ -61,6 +62,8 @@ The project is organized as a small discovery pipeline rather than a single anal
 - A Shiny dashboard and this rendered HTML summary.
 - A standalone Nextflow demo project that runs locally and maps to AWS Batch.
 
+For a full code-level walkthrough, see `docs/analysis_walkthrough.md`. That document explains why UMAP was used instead of t-SNE, how compartments were called, why donor-level pseudobulk is needed, how the scoring model works, and how to interpret each candidate class.
+
 ## Dataset Curation And Metadata
 
 The primary dataset is **GSE136103**, a human liver scRNA-seq study of healthy and cirrhotic tissue. The workflow downloads the public GEO archive, builds a sample manifest, and separates samples by species, tissue source, disease state, donor, and fraction.
@@ -87,6 +90,8 @@ qc %>%
 The preprocessing is implemented in Seurat. Each library is loaded from the GEO count matrices, converted to a Seurat object, annotated with curated metadata, and evaluated for gene counts, UMI counts, and mitochondrial fraction. The merged object is normalized, variable genes are selected, data are scaled, PCA is run, cells are clustered, and UMAP embeddings are generated.
 
 The mitochondrial cutoff is conservative. In fibrotic liver, stressed cells can carry disease information, so QC should remove technical failures without deleting the biology we are trying to study.
+
+I used UMAP rather than t-SNE for the main visualization because UMAP is fast, standard in current Seurat workflows, and useful for inspecting continuous activation programs. I do not use the UMAP layout as statistical evidence. It is a map for inspection; the inference comes from marker validation, donor-aware DE, pathway analysis, and external validation.
 
 Technical output:
 
@@ -160,20 +165,24 @@ pathways %>%
 
 ## Prioritization Framework
 
-I used a rule-based score because it is easy to audit in a small donor dataset. The score weighs:
+I used a rule-based score because it is easy to audit in a small donor dataset. I refined the score to separate marker strength from therapeutic tractability. A collagen gene can be an excellent fibrosis readout and still be a poor direct target. A receptor can be druggable and still carry safety risk. The scoring model now makes those tradeoffs explicit.
 
-- Disease association.
-- Cell-state specificity.
-- Donor-aware support.
-- Pathway support.
-- External validation.
-- Protein modality, such as secreted, surface, receptor, or enzyme.
-- Mouse conservation.
-- Public tractability and safety evidence.
+```{r scoring-method}
+score_method %>%
+  select(component, direction, max_points, rationale) %>%
+  kable()
+```
+
+Important scoring guardrails:
+
+- Donor-level pseudobulk credit is only awarded when the signal appears in the candidate's intended biological compartment.
+- Blood detectability is penalized when it weakens tissue specificity.
+- Broad vascular, immune, coagulation, or matrix biology receives safety or specificity penalties.
+- External validation includes GSE244832, GSE207310, and mouse ortholog directionality where available.
 
 ```{r candidates}
 candidate %>%
-  select(rank, gene, compartment, candidate_class, total_score, translational_nomination, nomination_caution) %>%
+  select(rank, gene, compartment, candidate_class, clinical_use_case, total_score, translational_nomination, nomination_caution) %>%
   arrange(rank) %>%
   datatable(options = list(pageLength = 20, scrollX = TRUE))
 ```
@@ -201,6 +210,16 @@ candidate %>%
 ### Macrophage candidates
 
 **TREM2, CD9, SPP1, and GPNMB** are biologically important macrophage-state candidates. I would keep them in the validation queue, especially for scar-associated macrophage biology, but I would not nominate them as therapeutic targets from this analysis alone.
+
+### Translational action plan
+
+The practical strategy is to move fastest where the evidence is strongest and the risk is lowest.
+
+1. **Biomarker track:** SMOC2, TIMP1, COL1A1, COL3A1, PLVAP, and ACKR1. Validate tissue localization, plasma or serum assayability where relevant, and pharmacodynamic behavior.
+2. **Stromal perturbation track:** PDGFRA and PDGFRB. Test whether perturbation reduces HSC/myofibroblast activation, collagen output, contraction, or proliferation while monitoring vascular and pericyte safety risk.
+3. **Macrophage mechanism track:** TREM2, CD9, SPP1, and GPNMB. Move these into macrophage-focused atlas validation, spatial proximity analysis, ligand-receptor modeling, and perturbation assays.
+
+Current MASH therapy context matters. Resmetirom and semaglutide now set the bar for noncirrhotic MASH with moderate to advanced fibrosis. A single-cell fibrosis program should therefore add value through cell-state biomarkers, patient stratification, pharmacodynamic readouts, and sharper stromal or immune mechanism hypotheses.
 
 ## External Validation
 
@@ -303,14 +322,9 @@ The Nextflow demo reads a small GSE136103-derived 10x-style matrix, attaches met
 
 ## What Went Beyond The Assignment
 
-- Donor-level pseudobulk differential expression.
-- Reference-informed label refinement using the published annotation object.
-- Focused GSE244832 Seurat object validation.
-- GSE207310 symbol-level validation with phenotype metadata.
-- Public evidence enrichment for tractability, safety, clinical context, localization, perturbation signal, and mouse conservation.
 - Interactive Shiny dashboard.
-- Rendered R Markdown HTML summary.
-- Standalone Nextflow demo with tracked outputs.
+- Standalone Nextflow demo that runs locally.
+- AWS-ready Nextflow pattern using the same demo contract.
 
 ## Final Recommendation
 
@@ -321,3 +335,17 @@ I would move forward with three follow-up tracks:
 3. **Mechanism validation track:** TREM2, CD9, SPP1, and GPNMB in a macrophage-focused atlas and spatial validation workflow.
 
 The next decisive experiments are spatial validation and perturbation assays. More ranking will not resolve the main questions. The key questions now are where the proteins localize, whether the signal is conserved in model systems, and whether perturbing the candidate changes a fibrosis-relevant phenotype.
+
+## References
+
+- Ramachandran et al. Resolving the fibrotic niche of human liver cirrhosis at single-cell level. Nature, 2019.
+- Ramachandran Seurat object, Edinburgh DataShare.
+- McInnes et al. UMAP visualization. Nature Biotechnology, 2018.
+- Kobak and Berens. The art of using t-SNE for single-cell transcriptomics. Nature Communications, 2019.
+- Single-cell best practices, data integration chapter.
+- Hoffman et al. dreamlet pseudobulk differential expression for large-scale single-cell data. Nature Communications, 2023.
+- pathfindR active-subnetwork enrichment documentation.
+- FDA Rezdiffra and Wegovy MASH approval pages.
+- Gilead STELLAR-3 selonsertib update.
+- Avsec et al. Enformer. Nature Methods, 2021.
+- Ji et al. DNABERT. Bioinformatics, 2021.

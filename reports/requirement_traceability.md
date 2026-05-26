@@ -16,9 +16,9 @@ This audit maps the assignment and stakeholder clarification to the repository. 
 | Required endothelial compartment | Complete | Marker set in `config/project.yaml`; ACKR1/PLVAP support in reports and tables |
 | Identify fibrosis/cirrhosis-associated genes or cell states | Complete | `reports/tables/pseudobulk_de_by_refined_state.csv`, `reports/tables/pseudobulk_priority_gene_de.csv` |
 | Pathway or mechanism analysis | Complete | `reports/tables/hallmark_pathway_enrichment.csv`, `reports/executive_summary/README.md` |
-| ML-assisted or rule-based biomarker prioritization score | Complete | `workflow/04_prioritize_targets.R`, `config/project.yaml`, `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
+| ML-assisted or rule-based biomarker prioritization score | Complete | `workflow/04_prioritize_targets.R`, `config/project.yaml`, `reports/tables/ranked_biomarker_target_candidates_translational.csv`, `reports/tables/target_prioritization_scoring_components.csv`, `reports/tables/target_prioritization_scoring_method.csv` |
 | Ranked list of 10-20 candidates | Complete | `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
-| Explain diagnostic, therapeutic, and validation relevance | Complete | `reports/executive_submission_summary.md`, `reports/executive_summary/README.md`, candidate table columns |
+| Explain diagnostic, therapeutic, and validation relevance | Complete | `reports/executive_submission_summary.md`, `docs/analysis_walkthrough.md`, `reports/executive_summary/README.md`, candidate table columns |
 | Reproducible GitHub repository | Complete | `README.md`, `Makefile`, `renv.lock`, `Dockerfile`, `nextflow/` |
 | README with setup instructions | Complete | `README.md` |
 | QC summary | Complete | `reports/tables/qc_by_library.csv`, `reports/tables/qc_filtered_by_library_compartment.csv` |
