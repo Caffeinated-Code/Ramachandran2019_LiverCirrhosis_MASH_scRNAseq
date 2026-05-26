@@ -34,6 +34,8 @@ The strongest translational point is that fibrosis markers and therapeutic targe
 
 The workflow curates GEO metadata, loads GSE136103 matrices, applies conservative QC, normalizes and clusters the human liver cells in Seurat, visualizes cells with UMAP, and assigns required disease compartments using marker programs.
 
+The UMAP is a visual map of transcriptomic similarity, not a statistical test. Nearby cells have similar expression profiles in the reduced-dimensional Seurat space. Overlap between labels can reflect real biology, such as continuous HSC activation or shared wound-healing programs, but it can also reflect broad labels, mixed states, or imperfect reference transfer. Discrepant labels are handled conservatively: marker scoring, cluster context, and published-reference support must agree before a fine label is used. Otherwise the state stays broad or unresolved.
+
 The published Ramachandran Seurat object is used as an annotation reference layer, not as the primary input. The analysis is rebuilt from GEO matrices, then the published `annotation_lineage` and `annotation_indepth` fields are used to refine cluster interpretation.
 
 Cell-level DE is retained as an exploratory screen. Donor-level pseudobulk DE is the main inferential layer because donor, not cell, is the biological replicate.
@@ -51,9 +53,9 @@ Pathway analysis summarizes disease-up programs by compartment. The current repo
 
 ## Validation
 
-GSE244832 was used as the first external MASH/HSC validation module. Candidate genes were harmonized by gene symbol, HSC-like clusters were summarized, and expression was compared across source conditions.
+GSE244832 was used as the first external MASH/HSC validation module. Candidate genes were harmonized by gene symbol, HSC-like clusters were summarized, and expression was compared across source conditions. The HTML report now uses the NORMAL to NAFL to NASH line plot as the primary view because it is easier to interpret than the heatmap for directionality.
 
-GSE207310 was used for independent bulk NAFLD/NASH directionality after mapping Ensembl IDs to gene symbols. It supports directionality but cannot prove cell of origin.
+GSE207310 was used for independent bulk NAFLD/NASH directionality after mapping Ensembl IDs to gene symbols. The bar plot is the primary view because it shows the NASH versus NAFL direction directly. This supports directionality but cannot prove cell of origin.
 
 GSE136103 blood libraries were used to flag broad circulating expression. GSE136103 mouse libraries were used as an ortholog conservation screen. The mouse module is useful for directionality, not powered preclinical DE, because the compact screen has one healthy and one fibrotic mouse sample.
 
