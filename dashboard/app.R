@@ -19,6 +19,9 @@ candidates <- read_dash("ranked_candidates.csv")
 de <- read_dash("de_results.csv")
 pathways <- read_dash("pathway_enrichment.csv")
 qc <- read_dash("qc_summary.csv")
+qc_decisions <- if (file.exists(file.path(data_dir, "qc_decision_log.csv"))) read_dash("qc_decision_log.csv") else tibble()
+qc_filter <- if (file.exists(file.path(data_dir, "qc_filter_summary.csv"))) read_dash("qc_filter_summary.csv") else tibble()
+qc_metrics <- if (file.exists(file.path(data_dir, "qc_metric_summary.csv"))) read_dash("qc_metric_summary.csv") else tibble()
 pseudobulk <- if (file.exists(file.path(data_dir, "pseudobulk_priority_gene_de.csv"))) read_dash("pseudobulk_priority_gene_de.csv") else tibble()
 hsc_validation <- if (file.exists(file.path(data_dir, "gse244832_hsc_candidate_validation.csv"))) read_dash("gse244832_hsc_candidate_validation.csv") else tibble()
 refined_clusters <- if (file.exists(file.path(data_dir, "refined_cluster_annotations.csv"))) read_dash("refined_cluster_annotations.csv") else tibble()
@@ -37,6 +40,14 @@ class_palette <- c(
   "future validation marker" = "#756BB1",
   "mechanistic marker" = "#756BB1"
 )
+compartment_palette <- c(
+  "mesenchymal_HSC_myofibroblast" = "#8C510A",
+  "macrophage_monocyte" = "#1B9E77",
+  "endothelial" = "#2166AC",
+  "other_or_unresolved" = "#6B7280"
+)
+
+dt_opts <- list(pageLength = 15, scrollX = TRUE, autoWidth = TRUE)
 
 ui <- fluidPage(
   titlePanel("Human Liver Fibrosis Single-Cell Target Discovery"),
@@ -52,14 +63,14 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel("UMAP", plotlyOutput("umap_plot", height = 650)),
         tabPanel("Candidates", DTOutput("candidate_table")),
-        tabPanel("Scoring", DTOutput("score_component_table"), DTOutput("score_method_table")),
+        tabPanel("Scoring", DTOutput("score_component_table"), tags$hr(), DTOutput("score_method_table")),
         tabPanel("Pseudobulk DE", DTOutput("pseudobulk_table")),
         tabPanel("GSE244832 HSC Validation", DTOutput("hsc_validation_table")),
         tabPanel("Blood And Mouse Validation", DTOutput("blood_validation_table"), DTOutput("mouse_validation_table")),
         tabPanel("Reference Labels", DTOutput("refined_cluster_table")),
         tabPanel("Differential Expression", DTOutput("de_table")),
         tabPanel("Pathways", DTOutput("pathway_table")),
-        tabPanel("QC", DTOutput("qc_table"))
+        tabPanel("QC", DTOutput("qc_decision_table"), tags$hr(), DTOutput("qc_filter_table"), tags$hr(), DTOutput("qc_metric_table"), tags$hr(), DTOutput("qc_table"))
       )
     )
   )
@@ -86,63 +97,105 @@ server <- function(input, output, session) {
   })
 
   output$candidate_table <- renderDT({
-    datatable(candidate_filtered(), filter = "top", options = list(pageLength = 15, scrollX = TRUE)) |>
+    datatable(candidate_filtered(), filter = "top", options = dt_opts) |>
       formatStyle(
         "candidate_class",
         backgroundColor = styleEqual(names(class_palette), unname(class_palette)),
         color = "white",
         fontWeight = "bold"
       ) |>
-      formatRound(c("total_score"), digits = 1)
+      formatStyle(
+        "compartment",
+        backgroundColor = styleEqual(names(compartment_palette), unname(compartment_palette)),
+        color = "white"
+      ) |>
+      formatRound(c("total_score", "avg_log2FC", "pseudobulk_log2FC"), digits = 2)
   })
 
   output$score_component_table <- renderDT({
-    datatable(score_components, filter = "top", options = list(pageLength = 20, scrollX = TRUE)) |>
+    datatable(score_components, filter = "top", options = dt_opts) |>
       formatStyle(
         "candidate_class",
         backgroundColor = styleEqual(names(class_palette), unname(class_palette)),
         color = "white",
         fontWeight = "bold"
-      )
+      ) |>
+      formatRound(c("total_score", "disease_association_points", "donor_consistency_points", "specificity_points", "pathway_points", "external_validation_points"), digits = 1)
   })
 
   output$score_method_table <- renderDT({
-    datatable(score_method, options = list(pageLength = 10, scrollX = TRUE))
+    datatable(score_method, options = dt_opts)
   })
 
   output$pseudobulk_table <- renderDT({
-    datatable(pseudobulk, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(pseudobulk, filter = "top", options = dt_opts) |>
+      formatRound(c("log2FC", "p_value", "p_adj"), digits = 3)
   })
 
   output$hsc_validation_table <- renderDT({
-    datatable(hsc_validation, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(hsc_validation, filter = "top", options = dt_opts) |>
+      formatRound(c("weighted_pct_detected", "weighted_mean_norm", "steatohepatitis_vs_normal_delta", "whole_liver_mean_norm", "whole_liver_pct_detected"), digits = 2)
   })
 
   output$blood_validation_table <- renderDT({
-    datatable(blood_validation, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(blood_validation, filter = "top", options = dt_opts) |>
+      formatRound(c("mean_log_normalized_expression", "mean_pct_detected"), digits = 2)
   })
 
   output$mouse_validation_table <- renderDT({
-    datatable(mouse_validation, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(mouse_validation, filter = "top", options = dt_opts) |>
+      formatRound(c("fibrotic_vs_healthy_delta", "pct_detected_delta"), digits = 2)
   })
 
   output$refined_cluster_table <- renderDT({
-    datatable(refined_clusters, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(refined_clusters, filter = "top", options = dt_opts)
   })
 
   output$de_table <- renderDT({
     de |>
       filter(compartment == input$compartment) |>
       arrange(p_val_adj) |>
-      datatable(filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+      datatable(filter = "top", options = dt_opts) |>
+      formatStyle(
+        "compartment",
+        backgroundColor = styleEqual(names(compartment_palette), unname(compartment_palette)),
+        color = "white"
+      ) |>
+      formatRound(c("avg_log2FC", "p_val", "p_val_adj", "pct.1", "pct.2"), digits = 3)
   })
 
   output$pathway_table <- renderDT({
-    datatable(pathways, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(pathways, filter = "top", options = dt_opts) |>
+      formatStyle(
+        "compartment",
+        backgroundColor = styleEqual(names(compartment_palette), unname(compartment_palette)),
+        color = "white"
+      ) |>
+      formatRound(c("p_value", "p_adj"), digits = 3)
+  })
+
+  output$qc_decision_table <- renderDT({
+    datatable(qc_decisions, filter = "top", options = dt_opts)
+  })
+
+  output$qc_filter_table <- renderDT({
+    datatable(qc_filter, options = dt_opts) |>
+      formatRound(c("pct_retained"), digits = 1)
+  })
+
+  output$qc_metric_table <- renderDT({
+    datatable(qc_metrics, options = dt_opts) |>
+      formatRound(colnames(qc_metrics)[vapply(qc_metrics, is.numeric, logical(1))], digits = 2)
   })
 
   output$qc_table <- renderDT({
-    datatable(qc, filter = "top", options = list(pageLength = 20, scrollX = TRUE))
+    datatable(qc, filter = "top", options = dt_opts) |>
+      formatStyle(
+        "compartment_call",
+        backgroundColor = styleEqual(names(compartment_palette), unname(compartment_palette)),
+        color = "white"
+      ) |>
+      formatRound(c("median_genes", "median_umis", "median_percent_mt", "median_percent_ribo", "median_percent_hb", "median_log10_genes_per_umi"), digits = 2)
   })
 }
 

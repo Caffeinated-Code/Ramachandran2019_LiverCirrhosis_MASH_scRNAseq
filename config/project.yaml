@@ -69,6 +69,13 @@ analysis:
   min_cells_per_gene: 3
   min_genes_per_cell: 200
   max_mito_percent_default: 25
+  qc_review:
+    min_genes_per_cell: 200
+    max_mito_percent: 25
+    ribosomal_percent: review_only
+    hemoglobin_percent: review_only
+    complexity_score: review_only
+    high_umi_or_gene_outliers: review_only
   top_variable_genes: 3000
   disease_contrast:
     reference: healthy

@@ -25,6 +25,7 @@ figures <- file.path(root, "reports", "figures")
 read_table <- function(name) readr::read_csv(file.path(tables, name), show_col_types = FALSE)
 candidate <- read_table("ranked_biomarker_target_candidates_translational.csv")
 score_method <- read_table("target_prioritization_scoring_method.csv")
+score_components <- read_table("target_prioritization_scoring_components.csv")
 pseudobulk <- read_table("pseudobulk_priority_gene_de.csv")
 pathways <- read_table("hallmark_pathway_enrichment.csv")
 gse244 <- read_table("gse244832_focused_object_candidate_summary.csv")
@@ -33,123 +34,203 @@ blood_role <- read_table("gse136103_blood_candidate_marker_role_summary.csv")
 mouse_ortholog <- read_table("gse136103_mouse_candidate_ortholog_summary.csv")
 secondary_validation <- read_table("gse136103_secondary_validation_summary.csv")
 qc <- read_table("qc_filtered_by_library_compartment.csv")
+qc_raw <- read_table("qc_by_library.csv")
+qc_metric_summary <- read_table("qc_metric_summary.csv")
+qc_filter_summary <- read_table("qc_filter_summary.csv")
+qc_decisions <- read_table("qc_decision_log.csv")
 nextflow_qc <- readr::read_csv(file.path(root, "reports", "nextflow_demo", "demo_qc_summary.csv"), show_col_types = FALSE)
+dt_opts <- list(pageLength = 15, scrollX = TRUE, autoWidth = TRUE)
+class_palette <- c(
+  "diagnostic biomarker" = "#2166AC",
+  "pharmacodynamic biomarker" = "#1B9E77",
+  "therapeutic target" = "#B2182B",
+  "future validation marker" = "#756BB1",
+  "mechanistic marker" = "#756BB1"
+)
+compartment_palette <- c(
+  "mesenchymal_HSC_myofibroblast" = "#8C510A",
+  "macrophage_monocyte" = "#1B9E77",
+  "endothelial" = "#2166AC",
+  "other_or_unresolved" = "#6B7280"
+)
 ```
 
-## Executive Takeaway
+## TLDR
 
-This analysis identifies fibrosis-associated cell states in human cirrhotic liver and turns them into a practical candidate list for biomarker and target follow-up. The work starts with the specified primary dataset, **GSE136103**, and follows a reproducible Seurat workflow through QC, annotation, donor-aware differential expression, pathway analysis, target ranking, and validation.
+FibroTarget-Liver is a reproducible single-cell workflow for human liver fibrosis target discovery. It starts from the public GSE136103 count matrices, runs a Seurat-based human liver analysis, validates priority candidates in MASH/NAFLD and preclinical context datasets, and produces ranked biomarker and target candidates with transparent evidence.
 
-The main biological result is clear: fibrosis signal is strongest in three connected niches.
+**Primary analysis question:** in human cirrhotic liver, which cell-state-linked genes are credible as diagnostic biomarkers, pharmacodynamic biomarkers, therapeutic hypotheses, or future validation markers?
 
-1. **Activated stromal and HSC/myofibroblast-like cells**, marked by collagen, matrix remodeling, and PDGF receptor biology.
-2. **Scar-associated endothelial programs**, especially ACKR1 and PLVAP.
-3. **Macrophage injury and repair states**, including TREM2, CD9, SPP1, and GPNMB, which need deeper macrophage-focused validation before target nomination.
+**Main biological result:** fibrosis signal is concentrated in a scar niche made of activated stromal/HSC/myofibroblast-like cells, scar-associated endothelial programs, and macrophage injury or repair states.
 
-The main translational result is also clear: the best fibrosis markers are not all good therapeutic targets. **COL1A1** and **COL3A1** are strong fibrosis burden readouts. **SMOC2** and **TIMP1** are stronger as secreted biomarker or pharmacodynamic candidates. **PDGFRA** and **PDGFRB** are the most actionable therapeutic hypotheses, with safety and tissue-selectivity questions. **PLVAP** and **ACKR1** are useful scar-niche and vascular remodeling markers, but intervention would require careful vascular safety evaluation.
+**Main translational result:** the strongest fibrosis markers are not automatically the best drug targets.
 
-## What Was Built
+| Use case | Best-supported candidates | Interpretation |
+|---|---|---|
+| Fibrosis burden and pharmacodynamic readout | COL1A1, COL3A1, TIMP1 | Strong scar signal; collagens are endpoints, not direct targets |
+| Secreted biomarker | SMOC2, TIMP1 | Practical assay potential; TIMP1 needs specificity checks |
+| Scar vascular niche | ACKR1, PLVAP | Strong tissue-state markers; targeting requires vascular safety work |
+| Therapeutic hypothesis | PDGFRA, PDGFRB | Druggable stromal receptor biology; safety window is the key question |
+| Macrophage validation queue | TREM2, CD9, SPP1, GPNMB | Important disease biology; needs macrophage atlas and spatial validation |
 
-The project is organized as a small discovery pipeline rather than a single analysis script. The core pieces are:
+**Most useful next step:** spatial and protein validation. More ranking will not answer the central translational questions. The next decision points are where the proteins localize, whether the signal is conserved in disease models, and whether perturbing the candidate changes a fibrosis-relevant phenotype.
 
-- A Seurat-based local analysis workflow for GSE136103.
-- Reference-informed annotation using the published Ramachandran Seurat object.
-- Donor-level pseudobulk differential expression by refined cell state.
-- Hallmark pathway enrichment for mechanism-level interpretation.
-- A rule-based biomarker and target prioritization score.
-- External validation using GSE244832 and GSE207310.
-- Public evidence enrichment from Open Targets, ClinicalTrials.gov, ClinVar, UniProt, PubMed, and mouse orthology.
-- A Shiny dashboard and this rendered HTML summary.
-- A standalone Nextflow demo project that runs locally and maps to AWS Batch.
+**What was built beyond the analysis:** an interactive Shiny dashboard and a standalone Nextflow demo that runs locally and maps to AWS.
 
-For a full code-level walkthrough, see `docs/analysis_walkthrough.md`. That document explains why UMAP was used instead of t-SNE, how compartments were called, why donor-level pseudobulk is needed, how the scoring model works, and how to interpret each candidate class.
+## Analysis Outcomes
 
-## Dataset Curation And Metadata
+| Requested outcome | Status | Evidence |
+|---|---|---|
+| Curate and summarize dataset and metadata | Complete | GEO manifest, sample inclusion/exclusion table, QC summaries |
+| Perform QC and preprocessing with choices explained | Complete | Seurat workflow, QC tables, method walkthrough |
+| Annotate major liver cell types and validate disease compartments | Complete | marker scores, dot plot, refined reference labels |
+| Identify fibrosis/cirrhosis-associated genes or cell states | Complete | cell-level screen plus donor-level pseudobulk DE |
+| Perform pathway or mechanism analysis | Complete | Hallmark enrichment and pathfindR extension plan |
+| Build AI/ML-assisted or rule-based prioritization score | Complete | transparent scoring model with positive evidence and penalties |
+| Produce ranked 10-20 candidates | Complete | ranked translational candidate table and dashboard filters |
+| Explain translational relevance | Complete | diagnostic, pharmacodynamic, therapeutic, and validation categories |
+| Reproducibility | Complete | Makefile, renv, Dockerfile, validation checks, Nextflow demo |
 
-The primary dataset is **GSE136103**, a human liver scRNA-seq study of healthy and cirrhotic tissue. The workflow downloads the public GEO archive, builds a sample manifest, and separates samples by species, tissue source, disease state, donor, and fraction.
+## Dataset Curation
 
-For the primary contrast, I used human liver tissue and excluded blood and mouse samples. That keeps the discovery question focused: healthy versus cirrhotic human liver. Blood and mouse libraries are now used downstream as secondary validation checks: blood for circulating marker specificity, mouse liver for ortholog conservation and preclinical directionality.
+The primary dataset is **GSE136103**, a human liver scRNA-seq study of healthy and cirrhotic tissue. The pipeline builds a sample manifest from the GEO archive and labels each library by species, tissue, disease state, donor, and fraction.
+
+Only human liver libraries are used for the primary discovery contrast. Blood and mouse libraries are excluded from the main contrast, then brought back as validation modules.
 
 ```{r qc-table}
 qc %>%
   group_by(disease_state, compartment_call) %>%
-  summarise(
-    cells = sum(cells),
-    libraries = n_distinct(sample_id),
-    donors = n_distinct(donor),
-    .groups = "drop"
-  ) %>%
+  summarise(cells = sum(cells), libraries = n_distinct(sample_id), donors = n_distinct(donor), .groups = "drop") %>%
   arrange(disease_state, compartment_call) %>%
   kable()
 ```
 
-**Why this matters:** fibrosis analysis is sensitive to sample composition. If blood, mouse, or non-liver samples are mixed into the main contrast, the strongest signals may reflect tissue source or species rather than liver fibrosis. Keeping them out of the discovery contrast and bringing them back for validation gives a cleaner biological question and a stronger translational read.
+Why this matters: if blood or mouse libraries are mixed into the main model, the largest signal may be tissue or species, not liver fibrosis. Keeping them separate makes the biological question cleaner.
 
 ## QC And Preprocessing
 
-The preprocessing is implemented in Seurat. Each library is loaded from the GEO count matrices, converted to a Seurat object, annotated with curated metadata, and evaluated for gene counts, UMI counts, and mitochondrial fraction. The merged object is normalized, variable genes are selected, data are scaled, PCA is run, cells are clustered, and UMAP embeddings are generated.
+The local analysis uses Seurat. Each library is loaded from GEO matrices, converted to a Seurat object, annotated with curated metadata, merged, filtered, normalized, scaled, clustered, and visualized with UMAP.
 
-The mitochondrial cutoff is conservative. In fibrotic liver, stressed cells can carry disease information, so QC should remove technical failures without deleting the biology we are trying to study.
+QC metrics reviewed:
 
-I used UMAP rather than t-SNE for the main visualization because UMAP is fast, standard in current Seurat workflows, and useful for inspecting continuous activation programs. I do not use the UMAP layout as statistical evidence. It is a map for inspection; the inference comes from marker validation, donor-aware DE, pathway analysis, and external validation.
+- **Detected genes per cell (`nFeature_RNA`)**: low values usually indicate empty droplets or poor capture.
+- **UMIs per cell (`nCount_RNA`)**: very high values can indicate doublets, but high RNA content can also be real in large or activated cells.
+- **Mitochondrial percentage**: high values can indicate damaged cells; in diseased liver, moderate elevation can also reflect stress biology.
+- **Ribosomal percentage**: helps flag stressed or technically biased libraries; not used as a hard filter in this compact run.
+- **Hemoglobin percentage**: helps flag blood/RBC ambient RNA contamination; reviewed but not used as a hard filter.
+- **Complexity (`log10 genes per UMI`)**: low complexity can mark poor-quality cells or ambient-dominated droplets.
 
-Technical output:
+```{r qc-decisions}
+qc_decisions %>%
+  select(metric, threshold_or_action, used_for_filtering, reason) %>%
+  kable()
+```
 
-- `reports/tables/qc_by_library.csv`
-- `reports/tables/qc_filtered_by_library_compartment.csv`
-- `reports/figures/umap_disease_state.png`
+```{r qc-filter}
+qc_filter_summary %>% kable()
+```
 
-## Cell Annotation And Required Compartments
+```{r qc-figure, out.width="80%"}
+knitr::include_graphics(file.path(figures, "qc_metric_distributions.png"))
+```
 
-The assignment asked for three disease-relevant compartments. All three were recovered and marker-validated.
+Key filtering choices:
 
-| Compartment | Markers used for validation | Interpretation |
+- minimum detected genes: 200
+- mitochondrial cutoff: 25 percent
+- variable genes: 3,000
+- graph and UMAP dimensions: first 20 PCs
+- clustering resolution: 0.5
+
+The 200-gene cutoff removes low-complexity droplets. The 25 percent mitochondrial cutoff is deliberately conservative because fibrotic liver contains stressed cells that may be biologically meaningful. Ribosomal percentage, hemoglobin percentage, UMI count, and complexity were reviewed and recorded, but not used as hard filters because each can reflect either artifact or biology depending on cell type and tissue state.
+
+UMAP is used rather than t-SNE because it is fast, standard in Seurat, and useful for inspecting continuous activation states. UMAP is only a visualization. Inference comes from marker validation, donor-level DE, pathway analysis, and external validation.
+
+Core files:
+
+- [Seurat preprocessing workflow](../workflow/03_compact_analysis.R)
+- [QC by library](tables/qc_by_library.csv)
+- [QC by library and compartment after filtering](tables/qc_filtered_by_library_compartment.csv)
+- [QC metric summary](tables/qc_metric_summary.csv)
+- [QC filter summary](tables/qc_filter_summary.csv)
+- [QC decision log](tables/qc_decision_log.csv)
+
+## Cell Annotation
+
+The required disease-relevant compartments were identified with marker programs and then checked against the published Ramachandran annotation object.
+
+The first-pass compartment labels are generated by marker scoring. For each cell, the workflow calculates the average normalized expression of each marker program. A cell is assigned to a required compartment when one program has the strongest score and passes the signal threshold. Cells without a clear signal remain `other_or_unresolved`.
+
+| Label in outputs | Meaning | Markers | Interpretation |
 |---|---|---|
-| HSC, mesenchymal, myofibroblast-like | COL1A1, COL3A1, ACTA2, TAGLN, PDGFRA, PDGFRB, LUM, DCN, RGS5 | Activated scar-producing stromal states |
-| Macrophage and monocyte | TREM2, CD9, SPP1, GPNMB, LST1, C1QA, C1QB, C1QC | Injury-associated immune and repair states |
-| Endothelial | ACKR1, PLVAP, VWF, PECAM1, KDR, RAMP2, ENG | Vascular remodeling and scar-associated endothelium |
-
-The published Ramachandran Seurat object was used as a reference layer for refined labels. I used its `annotation_lineage` and `annotation_indepth` fields to support cluster interpretation while keeping the GEO count matrices as the primary analysis input.
+| `mesenchymal_HSC_myofibroblast` | activated stromal compartment | COL1A1, COL3A1, ACTA2, TAGLN, PDGFRA, PDGFRB, LUM, DCN, RGS5 | scar-producing HSC/myofibroblast-like biology |
+| `macrophage_monocyte` | immune remodeling compartment | TREM2, CD9, SPP1, GPNMB, LST1, C1QA, C1QB, C1QC | injury-associated macrophage/monocyte biology |
+| `endothelial` | vascular compartment | ACKR1, PLVAP, VWF, PECAM1, KDR, RAMP2, ENG | scar-associated endothelial remodeling |
+| `other_or_unresolved` | not confidently assigned to the required compartments | mixed or low marker support | retained but not overinterpreted |
 
 ```{r annotation-figures, out.width="48%", fig.show='hold'}
 knitr::include_graphics(file.path(figures, "required_compartment_marker_dotplot.png"))
 knitr::include_graphics(file.path(figures, "umap_refined_cell_states.png"))
 ```
 
-**Interpretation:** the required compartments are present, but the labels stay conservative. For example, an activated stromal cluster with COL1A1, COL3A1, ACTA2, TAGLN, PDGFRB, LUM, and DCN is best described as HSC/myofibroblast-like unless deeper subannotation separates hepatic stellate cells, portal fibroblasts, pericytes, and mixed stromal states.
+How to read the marker dot plot:
+
+- Dot size shows the fraction of cells in that output label expressing the marker.
+- Color intensity shows average normalized expression.
+- A convincing compartment should show several expected markers together, not one isolated marker.
+
+How to read the refined UMAP:
+
+- Each point is a cell embedded by transcriptomic similarity.
+- Labels ending in `reference_supported` are clusters whose marker profile was supported by the published Ramachandran annotation layer.
+- The UMAP is used for visual inspection, not for statistical testing.
+
+The published Seurat object was used as an annotation reference, not as the primary analysis input. The pipeline rebuilds the analysis from GEO matrices, then uses `annotation_lineage` and `annotation_indepth` from the published object to refine broad cluster interpretation. This adds expert context while preserving raw-count reproducibility.
+
+Caution: activated HSCs, portal fibroblasts, pericytes, and myofibroblast-like states share collagen and contractile programs. The labels stay conservative unless deeper evidence supports finer subtype calls.
 
 ## Fibrosis-Associated Genes And Cell States
 
-I kept two differential expression layers:
+Two DE layers are reported because they answer different questions.
 
-1. **Cell-level DE**, useful for screening.
-2. **Donor-level pseudobulk DE**, used for interpretation.
+| Layer | Script | Output table | Statistical unit | Interpretation role |
+|---|---|---|---|---|
+| Cell-level DE | [workflow/03_compact_analysis.R](../workflow/03_compact_analysis.R) | [compartment_de_cell_level_exploratory.csv](tables/compartment_de_cell_level_exploratory.csv) | individual cells | fast screen for compartment markers |
+| Donor-level pseudobulk DE | [workflow/08_pseudobulk_de.R](../workflow/08_pseudobulk_de.R) | [pseudobulk_de_by_refined_state.csv](tables/pseudobulk_de_by_refined_state.csv) | donor by refined cell state | main inferential evidence |
 
-The pseudobulk model aggregates counts by donor and refined cell state. This avoids treating thousands of cells from one donor as thousands of independent biological replicates.
+**Cell-level DE result:** the exploratory Seurat Wilcoxon screen recovered expected cirrhosis-up programs, including collagen/matrix genes in stromal states, endothelial remodeling markers, and macrophage injury-state genes. This table is useful for discovery and pathway screening. It is not used alone for target nomination because cells from the same donor are not independent biological replicates.
+
+**Why pseudobulk was done:** pseudobulk aggregates raw counts by donor and refined cell state, then tests disease effects at the donor level. This prevents a donor with many cells from dominating the p-value and gives a more honest read of whether a signal is reproducible across people.
+
+Table: priority-gene donor-level pseudobulk results. `log2FC` is cirrhotic versus healthy within the refined cell state; `p_adj` is FDR-adjusted.
 
 ```{r pseudobulk}
 pseudobulk %>%
   filter(gene %in% c("SMOC2", "TIMP1", "PLVAP", "ACKR1", "COL1A1", "COL3A1", "PDGFRA", "PDGFRB", "TREM2", "CD9", "SPP1", "GPNMB")) %>%
   select(refined_cell_state, gene, log2FC, p_adj, n_healthy_donors, n_cirrhotic_donors) %>%
   arrange(p_adj) %>%
-  datatable(options = list(pageLength = 12, scrollX = TRUE))
+  datatable(filter = "top", options = dt_opts) %>%
+  formatRound(c("log2FC", "p_adj"), digits = 3)
 ```
 
-Key signal:
+Main inference:
 
-- **COL1A1** and **COL3A1** are strongly higher in HSC/myofibroblast-like cirrhotic states.
-- **TIMP1** is higher in the same scar-producing compartment and is assayable as a secreted marker.
-- **PDGFRA** has donor-level support in HSC/myofibroblast-like cells and is biologically plausible for HSC activation.
-- **ACKR1** is strongly supported in endothelial states and fits scar-associated vascular remodeling.
-- **PLVAP** supports endothelial remodeling, but any signal outside endothelial clusters should be treated carefully because scar regions can contain closely apposed vascular and stromal cells.
+- COL1A1, COL3A1, TIMP1, and PDGFRA have donor-level support in HSC/myofibroblast-like states.
+- ACKR1 has strong endothelial support, consistent with scar-associated vascular remodeling.
+- PLVAP supports vascular remodeling, but any signal in mixed scar-niche states should be checked with spatial or protein validation.
+- TREM2, CD9, SPP1, and GPNMB remain important macrophage-state candidates, but this compact run does not treat them as therapeutic nominations without a macrophage-focused validation atlas.
 
-## Pathway And Mechanism Analysis
+Caveats:
 
-Pathway enrichment was used to summarize biology, not to claim causality. The enriched programs fit known liver fibrosis biology:
+- Some rare refined states are not tested if they lack enough donors or cells.
+- Pseudobulk can dilute rare substate signal when annotations are broad.
+- A larger production run should include covariates such as age, sex, etiology, chemistry, and batch when available.
 
-- Matrix remodeling and epithelial-mesenchymal transition-like programs in stromal states.
-- Coagulation, junction, and vascular remodeling programs in endothelial states.
-- Lipid handling, oxidative phosphorylation, and inflammatory or repair programs in macrophage states.
+## Pathway And Mechanism
+
+Hallmark enrichment was used to summarize disease-up programs by compartment. The source table is [hallmark_pathway_enrichment.csv](tables/hallmark_pathway_enrichment.csv), generated in [workflow/04_prioritize_targets.R](../workflow/04_prioritize_targets.R).
+
+Table: top enriched Hallmark terms per compartment. `overlap` is the number of disease-up genes in the pathway; `p_adj` is the adjusted enrichment p-value.
 
 ```{r pathways}
 pathways %>%
@@ -158,14 +239,46 @@ pathways %>%
   group_by(compartment) %>%
   slice_head(n = 5) %>%
   ungroup() %>%
-  datatable(options = list(pageLength = 15, scrollX = TRUE))
+  datatable(filter = "top", options = dt_opts) %>%
+  formatStyle(
+    "compartment",
+    backgroundColor = styleEqual(names(compartment_palette), unname(compartment_palette)),
+    color = "white"
+  ) %>%
+  formatRound("p_adj", digits = 3)
 ```
 
-**Mechanistic read:** the strongest therapeutic biology is not a single gene. It is a scar niche involving activated stromal cells, remodeled vasculature, and macrophage injury programs.
+Mechanistic read:
 
-## Prioritization Framework
+- stromal states: matrix remodeling and EMT-like programs
+- endothelial states: vascular remodeling, junction, and coagulation-linked programs
+- macrophage states: injury, repair, lipid handling, and metabolic programs
 
-I used a rule-based score because it is easy to audit in a small donor dataset. I refined the score to separate marker strength from therapeutic tractability. A collagen gene can be an excellent fibrosis readout and still be a poor direct target. A receptor can be druggable and still carry safety risk. The scoring model now makes those tradeoffs explicit.
+```{r pathway-plots, out.width="48%", fig.show="hold"}
+knitr::include_graphics(file.path(figures, "pathway_enrichment_barplot.png"))
+knitr::include_graphics(file.path(figures, "pathway_enrichment_dotplot.png"))
+```
+
+How to read the plots:
+
+- The bar plot is an EnrichR-style view: longer bars mean stronger adjusted enrichment.
+- The dot plot shows the same results across compartments: dot size is overlap gene count and color is `-log10(FDR)`.
+- These plots show mechanism themes, not causal proof.
+
+A production extension would add pathfindR or ReactomePA on donor-level pseudobulk signatures. pathfindR is especially useful because it searches active subnetworks in a protein-interaction graph before pathway enrichment, which can produce mechanism figures that are easier to connect to target biology.
+
+## Prioritization Score
+
+The scoring model is rule-based because the donor count is small and transparency matters. It rewards disease biology, donor support, validation, modality, and conservation, while penalizing broad expression and safety risk.
+
+Candidate-class guide:
+
+| Class | Meaning | How to use it |
+|---|---|---|
+| Diagnostic biomarker | A gene or protein that helps detect disease state or fibrosis burden | prioritize assayability, specificity, and validation across cohorts |
+| Pharmacodynamic biomarker | A marker expected to move with treatment response | useful for early experiments and dose-response studies |
+| Therapeutic target | A plausible intervention point with druggable biology | requires perturbation, safety, and tissue-selectivity evidence |
+| Future validation marker | Biologically compelling but not ready for nomination | keep in validation queue, especially for spatial or macrophage-focused studies |
 
 ```{r scoring-method}
 score_method %>%
@@ -173,179 +286,216 @@ score_method %>%
   kable()
 ```
 
-Important scoring guardrails:
+Guardrails:
 
-- Donor-level pseudobulk credit is only awarded when the signal appears in the candidate's intended biological compartment.
+- A gene receives pseudobulk credit only when support appears in its intended compartment.
 - Blood detectability is penalized when it weakens tissue specificity.
-- Broad vascular, immune, coagulation, or matrix biology receives safety or specificity penalties.
-- External validation includes GSE244832, GSE207310, and mouse ortholog directionality where available.
+- Vascular, immune, coagulation, broad stromal, and direct matrix-targeting risks are penalized.
+- External validation includes GSE244832, GSE207310, blood specificity, and mouse ortholog checks.
 
 ```{r candidates}
 candidate %>%
   select(rank, gene, compartment, candidate_class, clinical_use_case, total_score, translational_nomination, nomination_caution) %>%
   arrange(rank) %>%
-  datatable(options = list(pageLength = 20, scrollX = TRUE))
+  datatable(filter = "top", options = list(pageLength = 20, scrollX = TRUE, autoWidth = TRUE)) %>%
+  formatStyle(
+    "candidate_class",
+    backgroundColor = styleEqual(names(class_palette), unname(class_palette)),
+    color = "white",
+    fontWeight = "bold"
+  ) %>%
+  formatStyle(
+    "compartment",
+    backgroundColor = styleEqual(names(compartment_palette), unname(compartment_palette)),
+    color = "white"
+  ) %>%
+  formatRound("total_score", digits = 1)
 ```
 
-## Translational Interpretation
+## Validation
 
-### Best biomarker and pharmacodynamic candidates
+### GSE244832: MASH/HSC Validation
 
-**SMOC2** is a strong translational biomarker candidate. It is secreted, HSC-linked, and supported by NAFLD/NASH literature. In this project, it gains additional support from GSE244832 and GSE207310 validation. I would position SMOC2 as a diagnostic or pharmacodynamic marker before calling it a direct therapeutic target.
-
-**TIMP1** is also a strong assayable fibrosis marker. It fits matrix remodeling and is elevated in fibrotic contexts. The main caution is specificity: TIMP1 is a broad injury and remodeling signal, so it needs context-aware interpretation.
-
-### Best therapeutic hypotheses
-
-**PDGFRA** and **PDGFRB** are the strongest therapeutic hypotheses from this compact analysis. They are receptor tyrosine kinases linked to activated stromal and pericyte biology. They are also druggable in principle. The central question is therapeutic window, because PDGF signaling is not liver-specific and has vascular and mesenchymal roles.
-
-### Best scar-niche markers
-
-**ACKR1** and **PLVAP** are strong endothelial and scar-associated vascular markers. They are valuable for spatial validation, tissue-state classification, and vascular niche biology. I would be cautious about direct targeting until protein localization and vascular safety are clearer.
-
-### Best fibrosis burden readouts
-
-**COL1A1** and **COL3A1** are excellent fibrosis burden markers. They are useful for tissue-state scoring and pharmacodynamic response, but they are not attractive direct targets because collagen is central to normal wound healing and connective tissue integrity.
-
-### Macrophage candidates
-
-**TREM2, CD9, SPP1, and GPNMB** are biologically important macrophage-state candidates. I would keep them in the validation queue, especially for scar-associated macrophage biology, but I would not nominate them as therapeutic targets from this analysis alone.
-
-### Translational action plan
-
-The practical strategy is to move fastest where the evidence is strongest and the risk is lowest.
-
-1. **Biomarker track:** SMOC2, TIMP1, COL1A1, COL3A1, PLVAP, and ACKR1. Validate tissue localization, plasma or serum assayability where relevant, and pharmacodynamic behavior.
-2. **Stromal perturbation track:** PDGFRA and PDGFRB. Test whether perturbation reduces HSC/myofibroblast activation, collagen output, contraction, or proliferation while monitoring vascular and pericyte safety risk.
-3. **Macrophage mechanism track:** TREM2, CD9, SPP1, and GPNMB. Move these into macrophage-focused atlas validation, spatial proximity analysis, ligand-receptor modeling, and perturbation assays.
-
-Current MASH therapy context matters. Resmetirom and semaglutide now set the bar for noncirrhotic MASH with moderate to advanced fibrosis. A single-cell fibrosis program should therefore add value through cell-state biomarkers, patient stratification, pharmacodynamic readouts, and sharper stromal or immune mechanism hypotheses.
-
-## External Validation
-
-### GSE244832: MASH HSC Validation
-
-GSE244832 was used because it is a human MASLD/MASH dataset centered on HSC activation. I ran two validation layers:
-
-1. Streamed candidate summaries by condition, cluster, and sample.
-2. A focused Seurat object reanalysis using candidate genes extracted from the large processed matrix.
+GSE244832 adds the closest external validation for HSC/myofibroblast biology in metabolic steatohepatitis.
 
 ```{r gse244}
 gse244 %>%
   filter(focused_compartment == "HSC_myofibroblast_like", gene %in% c("SMOC2", "TIMP1", "COL1A1", "COL3A1", "PDGFRA", "PDGFRB")) %>%
   select(gene, condition, cells, mean_norm_expression, pct_detected, nash_vs_normal_delta) %>%
   arrange(gene, condition) %>%
-  datatable(options = list(pageLength = 18, scrollX = TRUE))
+  datatable(filter = "top", options = dt_opts) %>%
+  formatRound(c("mean_norm_expression", "pct_detected", "nash_vs_normal_delta"), digits = 2)
 ```
 
-```{r gse244-figure, out.width="70%"}
+```{r gse244-figure, out.width="68%"}
 knitr::include_graphics(file.path(figures, "gse244832_focused_object_validation_heatmap.png"))
 ```
 
-Result:
+What was done:
 
-- SMOC2, TIMP1, PDGFRA, and PDGFRB show useful HSC-like validation signal in the NASH/MASH-relevant state.
-- COL1A1 and COL3A1 remain useful fibrosis burden markers.
-- The focused object approach makes the validation executable locally while leaving full all-gene object reanalysis as the cloud-scale extension.
+- The processed validation matrix was prepared into local gene, cell, count, and metadata files.
+- Candidate genes were harmonized by gene symbol.
+- HSC-like clusters were identified from stromal, collagen, and PDGF receptor marker expression.
+- Candidate expression was summarized by source condition and cluster.
+
+How to read the heatmap: rows are candidate genes, columns are source conditions or focused states, and color is mean normalized expression. Darker color means higher expression. The line plot below is a simpler trend view across NORMAL, NAFL, and NASH labels.
+
+```{r gse244-trend, out.width="68%"}
+knitr::include_graphics(file.path(figures, "gse244832_hsc_candidate_trend.png"))
+```
+
+Result: SMOC2, TIMP1, PDGFRA, and PDGFRB show useful HSC-like validation signal. COL1A1 and COL3A1 remain strong fibrosis burden markers.
 
 ### GSE207310: Bulk NAFLD/NASH Directionality
 
-GSE207310 provides bulk liver RNA-seq across NAFLD/NASH severity. The module parses GEO sample metadata, maps Ensembl IDs to symbols with `org.Hs.eg.db`, and tests candidate expression against NASH status and fibrosis grade.
+GSE207310 provides independent bulk liver RNA-seq directionality.
 
 ```{r gse207}
 gse207 %>%
   select(gene, log2FC_NASH_vs_NAFL, p_value, p_adj, fibrosis_grade_log2FC_per_unit, fibrosis_p_value) %>%
   arrange(p_value) %>%
-  datatable(options = list(pageLength = 12, scrollX = TRUE))
+  datatable(filter = "top", options = dt_opts) %>%
+  formatRound(c("log2FC_NASH_vs_NAFL", "p_value", "p_adj", "fibrosis_grade_log2FC_per_unit", "fibrosis_p_value"), digits = 3)
 ```
 
-```{r gse207-figure, out.width="70%"}
+```{r gse207-figure, out.width="68%"}
 knitr::include_graphics(file.path(figures, "gse207310_candidate_validation_heatmap.png"))
 ```
 
-Result:
+What was done:
 
-- SMOC2 is higher in NASH versus NAFL in the candidate-level model.
-- COL1A1, COL3A1, TIMP1, and PLVAP also show NASH directionality.
-- This is bulk tissue, so it supports directionality but not cell-of-origin by itself.
+- GEO phenotype metadata were parsed from the series matrix.
+- Per-sample count files were read and mapped from Ensembl IDs to gene symbols.
+- Candidate expression was modeled against NASH versus NAFL and fibrosis grade.
 
-### GSE136103 Blood And Mouse Secondary Validation
+How to read the heatmap: rows are candidate genes, columns are disease labels, and color is mean log2 CPM. Darker color means higher bulk expression. The bar plot below shows the NASH versus NAFL direction directly.
 
-The excluded GSE136103 blood and mouse libraries were analyzed as validation modules rather than mixed into the primary contrast.
+```{r gse207-barplot, out.width="68%"}
+knitr::include_graphics(file.path(figures, "gse207310_candidate_directionality_barplot.png"))
+```
+
+Caution: bulk RNA-seq supports directionality but not cell of origin.
+
+### Blood And Mouse Secondary Validation
 
 ```{r secondary-validation}
 secondary_validation %>% kable()
 ```
 
-Human blood asks a practical specificity question: are priority candidates broad circulating markers, or are they more liver-niche biased? LST1 and TIMP1 are detectable in blood, which is expected for myeloid and injury-remodeling biology. Most stromal, endothelial, and matrix candidates, including SMOC2, COL1A1, COL3A1, PDGFRA, PLVAP, and ACKR1, are low or absent across the four blood libraries.
+Blood checks whether candidates are broadly detectable in circulation. Mouse checks ortholog conservation and fibrotic directionality.
 
 ```{r blood-validation}
 blood_role %>%
   select(validation_role, gene, samples, mean_log_normalized_expression, mean_pct_detected) %>%
   arrange(desc(mean_log_normalized_expression)) %>%
-  datatable(options = list(pageLength = 16, scrollX = TRUE))
+  datatable(filter = "top", options = dt_opts) %>%
+  formatRound(c("mean_log_normalized_expression", "mean_pct_detected"), digits = 2)
 ```
-
-```{r blood-figure, out.width="62%"}
-knitr::include_graphics(file.path(figures, "gse136103_blood_candidate_marker_heatmap.png"))
-```
-
-Mouse liver asks a different question: are the human candidate genes conserved enough to support preclinical follow-up? The module maps human genes to mouse orthologs with `babelgene`, then compares the one healthy and one fibrotic mouse liver sample. This is a conservation and directionality screen, not a differential-expression claim.
 
 ```{r mouse-validation}
 mouse_ortholog %>%
   select(human_gene, mouse_gene, validation_role, fibrotic_vs_healthy_delta, pct_detected_delta, interpretation) %>%
   arrange(desc(fibrotic_vs_healthy_delta)) %>%
-  datatable(options = list(pageLength = 16, scrollX = TRUE))
+  datatable(filter = "top", options = dt_opts) %>%
+  formatRound(c("fibrotic_vs_healthy_delta", "pct_detected_delta"), digits = 2)
 ```
 
-```{r mouse-figure, out.width="62%"}
-knitr::include_graphics(file.path(figures, "gse136103_mouse_candidate_ortholog_heatmap.png"))
+How to read these validation tables:
+
+- Blood table: higher percent detected means a candidate is more broadly visible in circulating cells. Broad blood signal can reduce tissue specificity.
+- Mouse table: positive delta means the mouse ortholog is higher in fibrotic than healthy mouse liver.
+
+```{r blood-mouse-simple-plots, out.width="48%", fig.show="hold"}
+knitr::include_graphics(file.path(figures, "gse136103_blood_candidate_detectability_barplot.png"))
+knitr::include_graphics(file.path(figures, "gse136103_mouse_ortholog_directionality_barplot.png"))
 ```
 
-Result:
+Interpretation:
 
-- Blood supports the specificity story for stromal and endothelial candidates: they are not simply high everywhere in circulation.
-- TIMP1 is detectable in blood, so it remains attractive as an assayable marker but needs context-aware interpretation.
-- Mouse fibrotic liver shows strong directionality for macrophage-state orthologs such as Trem2, Spp1, Gpnmb, Cd9, and complement genes.
-- Mouse stromal candidates are present but weaker in this small comparison. That keeps PDGFRA/B, SMOC2, and collagen candidates in the preclinical queue, but does not by itself prove model fidelity.
+- TIMP1 and LST1 are detectable in blood, so they need context-aware interpretation.
+- Most stromal, endothelial, and collagen candidates are low or absent in blood.
+- Fibrotic mouse liver shows the strongest directionality for macrophage-state orthologs.
+- Mouse stromal signal is present but weak in the two-sample screen.
+
+## Translational Recommendation
+
+The current MASH treatment landscape raises the bar. Resmetirom is approved for noncirrhotic NASH/MASH with F2-F3 fibrosis, and semaglutide is approved for MASH with moderate-to-advanced fibrosis. Late-stage FGF21 programs continue to move through MASH and compensated cirrhosis. At the same time, failures such as selonsertib and simtuzumab show why fibrosis programs need strong mechanism, patient selection, and pharmacodynamic biomarkers.
+
+The best near-term strategy is:
+
+1. **Biomarker track:** SMOC2, TIMP1, COL1A1, COL3A1, PLVAP, ACKR1.
+2. **Stromal perturbation track:** PDGFRA and PDGFRB in HSC activation assays.
+3. **Macrophage mechanism track:** TREM2, CD9, SPP1, GPNMB in a macrophage-focused atlas and spatial workflow.
+
+Enformer and DNABERT-like models can be useful later if the question becomes regulatory, such as enhancer or promoter control of a candidate gene. They are not substitutes for donor-aware expression, protein localization, and perturbation assays.
 
 ## Infrastructure And Reproducibility
 
-The workflow can be run locally through `make` targets. The repository also includes a Dockerfile, `renv.lock`, and a standalone Nextflow demo project.
+The repo includes local and cloud-facing execution paths. The local repo is designed for transparent review; the Nextflow demo is designed to prove the pipeline contract on a small tracked dataset.
 
 ```{r nextflow}
 nextflow_qc %>% kable()
 ```
 
-The Nextflow demo reads a small GSE136103-derived 10x-style matrix, attaches metadata, summarizes disease compartments, checks candidate-gene presence, and writes outputs to `reports/nextflow_demo/`. This provides a testable base for local or AWS execution.
+Core reproducibility pieces:
+
+- [Makefile](../Makefile): one-command local workflow targets.
+- [renv.lock](../renv.lock): pinned R package environment.
+- [Dockerfile](../Dockerfile): container recipe for the R runtime and system libraries.
+- [Repository validator](../scripts/validate_repo_structure.py): checks required files and prevents private or large raw data from being tracked.
+- [Nextflow demo](../nextflow/fibrotarget_demo/): local/AWS workflow contract test.
+
+The Dockerfile provides a reproducible R environment for the analysis stack. It is meant to reduce setup differences across machines, especially for Seurat, tidyverse-style reporting, and system libraries needed by R packages.
+
+The Nextflow demo reads a tracked GSE136103-derived 10x-style matrix, attaches metadata, summarizes QC and candidate-gene presence, and writes expected outputs to `reports/nextflow_demo/`. It proves that the input/output contract works locally and can map to AWS Batch. It does not re-run the full single-cell analysis or replace the Seurat workflow yet.
+
+Current practical requirements:
+
+| Run mode | Expected requirements | Typical use |
+|---|---|---|
+| Review only | GitHub browser or local clone | inspect reports, figures, tables |
+| Local Seurat workflow | R 4.6, Seurat 5.5, renv, several GB RAM, GEO archives | reproduce compact analysis |
+| Dashboard | R, Shiny, DT, plotly | interactive result review |
+| Nextflow demo | Java, Nextflow, small demo data | test workflow wiring |
+| AWS production extension | S3, ECR, AWS Batch/ECS, CloudWatch, container image | scale proprietary or full validation datasets |
+
+Next infrastructure steps:
+
+- Convert the demo into modular Nextflow processes for QC, annotation, pseudobulk, validation, and reporting.
+- Add formal samplesheet schema validation.
+- Add containerized CI on the demo dataset.
+- Add AWS Batch documentation with IAM, S3 layout, ECR image, job queue, and logs.
 
 ## What Went Beyond The Assignment
 
-- Interactive Shiny dashboard.
-- Standalone Nextflow demo that runs locally.
+Kept modest and practical:
+
+- [Interactive Shiny dashboard](../dashboard/app.R) for UMAP, candidate classes, scoring, DE, validation, and QC review.
+- [Standalone Nextflow demo](../nextflow/fibrotarget_demo/README.md) that runs locally on tracked demo data.
 - AWS-ready Nextflow pattern using the same demo contract.
 
-## Final Recommendation
+## Next Steps
 
-I would move forward with three follow-up tracks:
-
-1. **Biomarker track:** SMOC2, TIMP1, COL1A1, COL3A1, ACKR1, and PLVAP for tissue-state and pharmacodynamic readouts.
-2. **Therapeutic hypothesis track:** PDGFRA and PDGFRB in HSC or stromal activation assays, with early attention to safety and tissue selectivity.
-3. **Mechanism validation track:** TREM2, CD9, SPP1, and GPNMB in a macrophage-focused atlas and spatial validation workflow.
-
-The next decisive experiments are spatial validation and perturbation assays. More ranking will not resolve the main questions. The key questions now are where the proteins localize, whether the signal is conserved in model systems, and whether perturbing the candidate changes a fibrosis-relevant phenotype.
+1. Spatial validation for SMOC2, TIMP1, PLVAP, ACKR1, PDGFRA/B, and macrophage-state markers.
+2. Full GSE244832 all-gene object reanalysis on AWS.
+3. Macrophage-focused atlas validation for TREM2, CD9, SPP1, and GPNMB.
+4. pathfindR or ReactomePA active mechanism module.
+5. LIANA, NicheNet, or CellChat communication analysis with donor and receiver-response filters.
+6. Perturbation assays before therapeutic nomination.
 
 ## References
 
-- Ramachandran et al. Resolving the fibrotic niche of human liver cirrhosis at single-cell level. Nature, 2019.
-- Ramachandran Seurat object, Edinburgh DataShare.
-- McInnes et al. UMAP visualization. Nature Biotechnology, 2018.
-- Kobak and Berens. The art of using t-SNE for single-cell transcriptomics. Nature Communications, 2019.
-- Single-cell best practices, data integration chapter.
-- Hoffman et al. dreamlet pseudobulk differential expression for large-scale single-cell data. Nature Communications, 2023.
-- pathfindR active-subnetwork enrichment documentation.
-- FDA Rezdiffra and Wegovy MASH approval pages.
-- Gilead STELLAR-3 selonsertib update.
-- Avsec et al. Enformer. Nature Methods, 2021.
-- Ji et al. DNABERT. Bioinformatics, 2021.
+- [Ramachandran et al., Nature 2019](https://www.nature.com/articles/s41586-019-1631-3)
+- [Ramachandran Seurat object, Edinburgh DataShare](https://datashare.ed.ac.uk/handle/10283/3433)
+- [UMAP, McInnes et al.](https://www.nature.com/articles/nbt.4314)
+- [t-SNE for single-cell transcriptomics, Kobak and Berens](https://www.nature.com/articles/s41467-019-13056-x)
+- [Single-cell best practices: integration](https://www.sc-best-practices.org/cellular_structure/integration)
+- [dreamlet pseudobulk differential expression](https://pmc.ncbi.nlm.nih.gov/articles/PMC10187426/)
+- [pathfindR](https://egeulgen.github.io/pathfindR/)
+- [Human liver scRNA-seq and snRNA-seq comparison](https://pmc.ncbi.nlm.nih.gov/articles/PMC8948611/)
+- [FDA Rezdiffra approval package](https://www.accessdata.fda.gov/drugsatfda_docs/nda/2024/217785Orig1s000Approv.pdf)
+- [FDA Wegovy MASH approval](https://www.fda.gov/drugs/news-events-human-drugs/fda-approves-treatment-serious-liver-disease-known-mash)
+- [Gilead STELLAR-3 selonsertib update](https://www.gilead.com/news/news-details/2019/gilead-announces-topline-data-from-phase-3-stellar-3-study-of-selonsertib-in-bridging-fibrosis-f3-due-to-nonalcoholic-steatohepatitis-nash)
+- [Roche and 89bio pegozafermin announcement](https://www.roche.com/media/releases/med-cor-2025-09-18)
+- [Enformer](https://www.nature.com/articles/s41592-021-01252-x)
+- [DNABERT](https://academic.oup.com/bioinformatics/article/37/15/2112/6128680)

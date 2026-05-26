@@ -9,16 +9,16 @@ This audit maps the assignment and stakeholder clarification to the repository. 
 | Use GSE136103 as the primary dataset | Complete | `config/project.yaml`, `workflow/01_fetch_data.R`, `workflow/02_curate_metadata.R` |
 | Compact end-to-end workflow | Complete | `Makefile`, `workflow/`, `scripts/`, `reports/`, `dashboard/` |
 | Curate and summarize dataset and metadata | Complete | `data/metadata/gse136103_sample_manifest.csv`, `reports/tables/qc_by_library.csv` |
-| QC and preprocessing with choices explained | Complete | `workflow/03_compact_analysis.R`, `reports/run_notes.md`, `reports/executive_submission_summary.md` |
+| QC and preprocessing with choices explained | Complete | `workflow/03_compact_analysis.R`, `reports/tables/qc_decision_log.csv`, `reports/executive_submission_summary.md`, `docs/analysis_walkthrough.md` |
 | Annotate major liver cell types and validate required compartments | Complete | `workflow/07_refine_annotations.R`, `reports/tables/refined_cluster_annotations.csv`, `reports/figures/required_compartment_marker_dotplot.png`, `reports/figures/umap_refined_cell_states.png` |
 | Required HSC/mesenchymal/myofibroblast compartment | Complete | Marker set in `config/project.yaml`; validation in marker dot plot and pseudobulk tables |
 | Required macrophage/monocyte compartment | Complete | Marker set in `config/project.yaml`; marker validation and candidate evidence |
 | Required endothelial compartment | Complete | Marker set in `config/project.yaml`; ACKR1/PLVAP support in reports and tables |
 | Identify fibrosis/cirrhosis-associated genes or cell states | Complete | `reports/tables/pseudobulk_de_by_refined_state.csv`, `reports/tables/pseudobulk_priority_gene_de.csv` |
-| Pathway or mechanism analysis | Complete | `reports/tables/hallmark_pathway_enrichment.csv`, `reports/executive_summary/README.md` |
+| Pathway or mechanism analysis | Complete | `reports/tables/hallmark_pathway_enrichment.csv`, `reports/figures/pathway_enrichment_barplot.png`, `reports/figures/pathway_enrichment_dotplot.png`, `docs/analysis_walkthrough.md` |
 | ML-assisted or rule-based biomarker prioritization score | Complete | `workflow/04_prioritize_targets.R`, `config/project.yaml`, `reports/tables/ranked_biomarker_target_candidates_translational.csv`, `reports/tables/target_prioritization_scoring_components.csv`, `reports/tables/target_prioritization_scoring_method.csv` |
 | Ranked list of 10-20 candidates | Complete | `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
-| Explain diagnostic, therapeutic, and validation relevance | Complete | `reports/executive_submission_summary.md`, `docs/analysis_walkthrough.md`, `reports/executive_summary/README.md`, candidate table columns |
+| Explain diagnostic, therapeutic, and validation relevance | Complete | `reports/executive_submission_summary.md`, `docs/analysis_walkthrough.md`, candidate table columns |
 | Reproducible GitHub repository | Complete | `README.md`, `Makefile`, `renv.lock`, `Dockerfile`, `nextflow/` |
 | README with setup instructions | Complete | `README.md` |
 | QC summary | Complete | `reports/tables/qc_by_library.csv`, `reports/tables/qc_filtered_by_library_compartment.csv` |
@@ -34,14 +34,14 @@ This audit maps the assignment and stakeholder clarification to the repository. 
 
 | Clarification | Status | Evidence |
 |---|---:|---|
-| Practical-level assignment, not publication-grade | Complete | Scope and limitations in `reports/executive_submission_summary.md` and `reports/run_notes.md` |
-| Show scientific thinking and single-cell/transcriptomic approach | Complete | `reports/screening_responses/README.md`, `reports/executive_summary/README.md` |
-| Interpret liver fibrosis biology, MASH, and cirrhosis critically | Complete | `reports/executive_submission_summary.md`, `reports/executive_summary/README.md` |
+| Practical-level assignment, not publication-grade | Complete | Scope and limitations in `reports/executive_submission_summary.md` and `docs/technical_appendix.md` |
+| Show scientific thinking and single-cell/transcriptomic approach | Complete | `reports/screening_responses/README.md`, `reports/executive_submission_summary.md`, `docs/analysis_walkthrough.md` |
+| Interpret liver fibrosis biology, MASH, and cirrhosis critically | Complete | `reports/executive_submission_summary.md`, `docs/analysis_walkthrough.md` |
 | Prioritize targets with translational relevance | Complete | `reports/tables/ranked_biomarker_target_candidates_translational.csv` |
 | Use raw/reproducible data processing, not only RData object | Complete | GEO count matrices are primary input; published Seurat object is only a reference layer |
-| Include validation dataset readiness and prioritization | Complete | `docs/validation_datasets.md`, `reports/tables/validation_dataset_feasibility.csv` |
+| Include validation dataset readiness and prioritization | Complete | `docs/technical_appendix.md`, `reports/tables/validation_dataset_feasibility.csv` |
 | Add public evidence such as Open Targets, ClinVar, trials, conservation, safety, perturbation | Complete | `scripts/enrich_target_evidence.py`, `scripts/enrich_translational_evidence.py`, `reports/tables/target_public_evidence.csv`, `reports/tables/target_translational_evidence.csv`, `reports/tables/target_mouse_orthology.csv` |
-| Consider production/AWS future | Complete | `nextflow/`, `Dockerfile`, `docs/aws_production_notes.md`, `docs/open_source_pipeline_roadmap.md` |
+| Consider production/AWS future | Complete | `nextflow/`, `Dockerfile`, `docs/technical_appendix.md`, `nextflow/fibrotarget_demo/README.md` |
 | Include interactive visualization | Complete | `dashboard/app.R` |
 | Do not track private conversation notes | Complete | `.gitignore`, `scripts/validate_repo_structure.py`, `git status` |
 | Use blood and mouse samples without confounding the primary contrast | Complete | `workflow/13_validate_blood_mouse_markers.R`, `reports/tables/gse136103_blood_candidate_marker_role_summary.csv`, `reports/tables/gse136103_mouse_candidate_ortholog_summary.csv` |

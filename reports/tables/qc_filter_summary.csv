@@ -1,0 +1,2 @@
+total_cells_before_filter,cells_after_filter,cells_removed_low_genes,cells_removed_high_mito,cells_removed_any_filter,pct_retained
+61900,60767,3,1133,1133,98.16962843295639

@@ -1,0 +1,2 @@
+total_cells_before_filter,median_genes,q05_genes,q95_genes,median_umis,q05_umis,q95_umis,median_percent_mt,q95_percent_mt,median_percent_ribo,q95_percent_ribo,median_percent_hb,q95_percent_hb,median_log10_genes_per_umi
+61900,1234,506,2889,3448,977.9500000000003,12277.049999999996,3.316230572063276,10.71432990419627,27.158483426556288,44.420875522304456,0,0.03856536829926726,0.8765779554131649
