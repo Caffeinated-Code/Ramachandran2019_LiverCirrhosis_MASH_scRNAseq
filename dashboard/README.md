@@ -17,7 +17,9 @@ export SHINYAPPS_SECRET="your-secret"
 Rscript scripts/deploy_shinyapps.R
 ```
 
-After deployment, add the returned shinyapps.io URL to the root README so reviewers can open the dashboard directly from GitHub.
+Hosted dashboard:
+
+- [FibroTarget-Liver dashboard](https://caffeinated-code.shinyapps.io/fibrotarget-liver/)
 
 Main views:
 

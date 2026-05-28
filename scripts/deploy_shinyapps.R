@@ -4,6 +4,22 @@ suppressPackageStartupMessages({
   library(rsconnect)
 })
 
+args <- commandArgs(trailingOnly = TRUE)
+if (any(args %in% c("-h", "--help"))) {
+  cat(
+    "Deploy the dashboard to shinyapps.io.\n\n",
+    "Optional environment variables:\n",
+    "  SHINYAPPS_ACCOUNT    shinyapps.io account name\n",
+    "  SHINYAPPS_TOKEN      shinyapps.io token\n",
+    "  SHINYAPPS_SECRET     shinyapps.io secret\n",
+    "  SHINYAPPS_APP_NAME   app name, default fibrotarget-liver\n\n",
+    "Usage:\n",
+    "  Rscript scripts/deploy_shinyapps.R\n",
+    sep = ""
+  )
+  quit(status = 0)
+}
+
 account <- Sys.getenv("SHINYAPPS_ACCOUNT")
 token <- Sys.getenv("SHINYAPPS_TOKEN")
 secret <- Sys.getenv("SHINYAPPS_SECRET")
@@ -35,4 +51,14 @@ deployment <- rsconnect::deployApp(
   forceUpdate = TRUE
 )
 
-message("Dashboard deployed: ", deployment$url)
+deployment_url <- if (is.list(deployment) && !is.null(deployment$url)) {
+  deployment$url
+} else {
+  sprintf(
+    "https://%s.shinyapps.io/%s/",
+    accounts$name[[1]],
+    app_name
+  )
+}
+
+message("Dashboard deployed: ", deployment_url)
