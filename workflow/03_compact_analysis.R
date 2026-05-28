@@ -115,7 +115,7 @@ safe_write(qc_filter_summary, file.path(cfg$paths$tables_dir, "qc_filter_summary
 qc_decisions <- tibble::tribble(
   ~metric, ~threshold_or_action, ~used_for_filtering, ~reason,
   "Detected genes per cell", paste0(">=", cfg$analysis$min_genes_per_cell), TRUE, "Removes low-complexity droplets while retaining stressed disease-relevant cells.",
-  "Mitochondrial percent", paste0("<=", max_mt, "%"), TRUE, "Removes likely damaged cells; threshold is conservative because fibrotic liver can contain stressed biology.",
+  "Mitochondrial percent", paste0("<=", max_mt, "%"), TRUE, "Typical scRNA-seq filters often review 15-25% mitochondrial reads. This run uses 25% to remove likely damaged cells while retaining diseased or stressed liver cells with real injury biology.",
   "UMI count", "reviewed by library; no hard upper cutoff in compact run", FALSE, "High UMI cells can be doublets, but liver cell types differ in RNA content; hard filtering could remove large or active cells.",
   "Ribosomal percent", "reviewed by library; no hard cutoff", FALSE, "High ribosomal signal can reflect cell state or technical stress and is interpreted with other metrics.",
   "Hemoglobin percent", "reviewed by library; no hard cutoff", FALSE, "Flags erythrocyte/RBC ambient RNA contamination without removing liver cells solely on this metric.",

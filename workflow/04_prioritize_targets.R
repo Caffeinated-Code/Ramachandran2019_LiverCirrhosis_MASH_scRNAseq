@@ -63,11 +63,18 @@ manual_evidence <- tibble::tribble(
 score_cap <- function(x, cap) pmin(cap, pmax(0, x))
 
 pathfindr_gene_support <- if (nrow(pathfindr) > 0) {
-  pathfindr |>
-    filter(!is.na(Up_regulated), Up_regulated != "") |>
-    select(mechanism_compartment, Term_Description, Fold_Enrichment, lowest_p, Up_regulated) |>
-    tidyr::separate_longer_delim(Up_regulated, delim = ",") |>
-    mutate(gene = trimws(Up_regulated)) |>
+  bind_rows(
+    pathfindr |>
+      filter(!is.na(Up_regulated), Up_regulated != "") |>
+      select(mechanism_compartment, Term_Description, Fold_Enrichment, lowest_p, regulated = Up_regulated) |>
+      mutate(pathway_direction = "higher_in_cirrhosis"),
+    pathfindr |>
+      filter(!is.na(Down_regulated), Down_regulated != "") |>
+      select(mechanism_compartment, Term_Description, Fold_Enrichment, lowest_p, regulated = Down_regulated) |>
+      mutate(pathway_direction = "lower_in_cirrhosis")
+  ) |>
+    tidyr::separate_longer_delim(regulated, delim = ",") |>
+    mutate(gene = trimws(regulated)) |>
     group_by(gene, mechanism_compartment) |>
     summarise(
       pathfindr_terms = n_distinct(Term_Description),
@@ -252,8 +259,9 @@ genesets <- msigdbr(species = "Homo sapiens", collection = "H") |>
   select(gs_name, gene_symbol)
 universe <- unique(de$gene)
 pathway_results <- de_ranked |>
-  filter(p_val_adj < 0.05, avg_log2FC > 0.25) |>
-  group_by(compartment) |>
+  filter(p_val_adj < 0.05, abs(avg_log2FC) > 0.25) |>
+  mutate(pathway_direction = if_else(avg_log2FC > 0, "higher_in_cirrhosis", "lower_in_cirrhosis")) |>
+  group_by(compartment, pathway_direction) |>
   group_modify(function(.x, .y) {
     foreground <- unique(.x$gene)
     gs_split <- split(genesets$gene_symbol, genesets$gs_name)

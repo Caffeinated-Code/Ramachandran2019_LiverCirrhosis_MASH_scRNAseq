@@ -8,8 +8,7 @@ The demo does not reanalyze the full liver atlas. It proves the contract a produ
 
 - a sample sheet points to 10x-style input data
 - metadata are read in a consistent format
-- candidate genes are checked
-- compartment and QC summaries are written
+- QC flags, embedding, candidate direction, pathway-theme summaries, and rankings are written
 - outputs land in a predictable report directory
 
 That is the same pattern a larger workflow would use for proprietary or full public datasets.
@@ -55,8 +54,16 @@ Expected local outputs:
 ```text
 reports/nextflow_demo/
   demo_qc_summary.csv
+  demo_cell_qc_flags.csv
   demo_compartment_summary.csv
   demo_candidate_gene_presence.csv
+  demo_embedding.csv
+  demo_candidate_de.csv
+  demo_pathway_summary.csv
+  demo_ranked_candidates.csv
+  demo_qc_plot.png
+  demo_embedding_plot.png
+  demo_candidate_de_plot.png
   demo_run_summary.md
 ```
 
@@ -101,11 +108,19 @@ s3://<bucket>/fibrotarget-liver/
 ## Outputs
 
 - `demo_qc_summary.csv`
+- `demo_cell_qc_flags.csv`
 - `demo_compartment_summary.csv`
 - `demo_candidate_gene_presence.csv`
+- `demo_embedding.csv`
+- `demo_candidate_de.csv`
+- `demo_pathway_summary.csv`
+- `demo_ranked_candidates.csv`
+- `demo_qc_plot.png`
+- `demo_embedding_plot.png`
+- `demo_candidate_de_plot.png`
 - `demo_run_summary.md`
 
-The tracked outputs in `reports/nextflow_demo/` show the expected result shape.
+The tracked outputs in `reports/nextflow_demo/` show the expected result shape. The demo is intentionally small, but it touches the same conceptual stages as the full workflow: ingest, metadata, QC, embedding, disease-direction screen, pathway-style summary, candidate ranking, and reporting.
 
 ## Troubleshooting
 

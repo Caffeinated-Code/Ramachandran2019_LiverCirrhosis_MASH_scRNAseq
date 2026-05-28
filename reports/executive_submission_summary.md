@@ -40,9 +40,9 @@ The published Ramachandran Seurat object is used as an annotation reference laye
 
 Cell-level DE is retained as an exploratory screen. Donor-level pseudobulk DE is the main inferential layer because donor, not cell, is the biological replicate.
 
-Pathway analysis summarizes disease-up programs by compartment. Hallmark enrichment gives an EnrichR-style over-representation view of broad themes. pathfindR adds a second, donor-aware pathway layer from pseudobulk DE: it asks whether cirrhosis-up genes form connected protein-interaction modules before Reactome enrichment. That makes the mechanism readout more useful for target prioritization than a flat gene-list overlap alone.
+Pathway analysis summarizes disease-associated programs by compartment and direction. Hallmark enrichment gives an EnrichR-style over-representation view of broad themes. pathfindR adds a second, donor-aware pathway layer from pseudobulk DE: it asks whether significant genes form connected protein-interaction modules before Reactome enrichment. That makes the mechanism readout more useful for target prioritization than a flat gene-list overlap alone.
 
-The pathfindR module ran on HSC/myofibroblast and endothelial pseudobulk states, with bar plot and dot plot figures in the HTML report. HSC/myofibroblast terms were dominated by extracellular matrix organization, collagen formation, elastic fiber biology, collagen crosslinking, extracellular matrix degradation, and integrin interactions. Endothelial terms were also generated where donor-supported signal was sufficient. Macrophage states were not forced through pathfindR because the compact pseudobulk run did not produce enough cirrhosis-up macrophage genes at FDR < 0.05.
+The pathfindR module ran on HSC/myofibroblast and endothelial pseudobulk states, with bar plot and dot plot figures in the HTML report. HSC/myofibroblast terms were dominated by extracellular matrix organization, collagen formation, elastic fiber biology, collagen crosslinking, extracellular matrix degradation, and integrin interactions. Endothelial terms were also generated where donor-supported signal was sufficient. Macrophage states were not forced through pathfindR when the compact pseudobulk run did not produce enough significant macrophage genes at FDR < 0.05.
 
 ## Candidate Classes
 
@@ -72,7 +72,7 @@ The repo includes:
 - `dashboard/app.R` for interactive review
 - `nextflow/fibrotarget_demo/` for a local and AWS-ready workflow contract test
 
-The Nextflow demo reads a tracked 10x-style toy dataset, attaches metadata, computes QC and candidate-gene summaries, and writes expected outputs. It proves pipeline wiring and I/O behavior. It does not yet replace the full Seurat analysis.
+The Nextflow demo reads a tracked 10x-style toy dataset, attaches metadata, computes QC flags, creates a PCA/UMAP-style embedding, screens candidate direction, summarizes pathway themes, ranks candidates, and writes a small report. It proves pipeline wiring and I/O behavior. It does not replace the full Seurat analysis.
 
 ## Most Useful Next Steps
 

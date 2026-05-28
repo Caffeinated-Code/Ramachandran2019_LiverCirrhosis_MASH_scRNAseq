@@ -160,6 +160,8 @@ Interpretation:
 
 The requested disease-relevant compartments were identified using marker programs defined in [config/project.yaml](../config/project.yaml).
 
+These three compartments make biological sense because they cover the scar niche from three angles: stromal/HSC-myofibroblast cells produce matrix, macrophage/monocyte states coordinate injury and repair, and endothelial cells remodel vascular and immune trafficking interfaces. A short biology primer is available here: [biology_primer_liver_fibrosis.md](biology_primer_liver_fibrosis.md).
+
 | Compartment | Markers | Biological purpose |
 |---|---|---|
 | HSC/mesenchymal/myofibroblast-like | COL1A1, COL3A1, ACTA2, TAGLN, PDGFRA, PDGFRB, LUM, DCN, RGS5 | scar-producing stromal program |
@@ -167,6 +169,8 @@ The requested disease-relevant compartments were identified using marker program
 | Endothelial | ACKR1, PLVAP, VWF, PECAM1, KDR, RAMP2, ENG | scar-associated vascular remodeling |
 
 The code calculates marker scores and assigns a broad compartment if one program is clearly highest and above threshold. Cells without enough evidence remain `other_or_unresolved`.
+
+Technically, this is a transparent marker-scoring rule using the Seurat-normalized RNA `data` layer. The helper averages each marker set per cell, compares the three required compartment scores, and assigns the highest-scoring compartment only when the score clears the threshold.
 
 Why this is appropriate:
 
@@ -206,6 +210,12 @@ Purpose:
 - fast screening
 - obvious marker discovery
 - input to early pathway and candidate scoring
+
+Why Wilcoxon and FDR:
+
+- Wilcoxon is a common Seurat default for exploratory single-cell marker detection because it is rank-based and does not assume normally distributed expression.
+- FDR correction is used because thousands of genes are tested at once; it controls the expected proportion of false discoveries among called genes.
+- This layer is deliberately exploratory. Donor-level pseudobulk is the stronger evidence layer for nomination.
 
 Pitfall:
 
@@ -250,7 +260,7 @@ Caveats:
 
 ## 8. Pathway And Mechanism Analysis
 
-The workflow uses two complementary pathway views. The first is Hallmark over-representation analysis on compartment-specific cirrhosis-up genes. This is an EnrichR-style question: given a list of disease-up genes, which curated pathway sets are overrepresented? It is fast, transparent, and useful for broad mechanism themes.
+The workflow uses two complementary pathway views. The first is Hallmark over-representation analysis on direction-specific disease-associated genes. "Higher in cirrhosis" means positive cirrhotic-versus-healthy fold change; "lower in cirrhosis" means the opposite direction. This is an EnrichR-style question: given a list of genes moving in one direction, which curated pathway sets are overrepresented? It is fast, transparent, and useful for broad mechanism themes.
 
 Output:
 
@@ -266,7 +276,7 @@ Pathway enrichment is not proof of causality. It summarizes the biology that sho
 
 ### pathfindR From Pseudobulk DE
 
-pathfindR is the second pathway view. It adds value beyond EnrichR-style over-representation because it first asks whether donor-supported disease-up genes form connected active subnetworks in protein-interaction space, then tests pathway enrichment on those subnetworks. That is useful for target prioritization: a connected collagen-processing, matrix-remodeling, or vascular-remodeling module is more interpretable and experimentally actionable than a loose list of genes that happen to overlap the same pathway.
+pathfindR is the second pathway view. It adds value beyond EnrichR-style over-representation because it first asks whether donor-supported disease-associated genes form connected active subnetworks in protein-interaction space, then tests pathway enrichment on those subnetworks. That is useful for target prioritization: a connected collagen-processing, matrix-remodeling, or vascular-remodeling module is more interpretable and experimentally actionable than a loose list of genes that happen to overlap the same pathway.
 
 ```mermaid
 flowchart LR
@@ -281,7 +291,7 @@ flowchart LR
 How it is used here:
 
 - input is donor-level pseudobulk DE, not cell-level DE
-- only cirrhosis-up genes with FDR < 0.05 are used
+- significant genes in either direction with FDR < 0.05 are used, with signed log fold change preserved
 - Reactome terms are tested from active subnetworks
 - HSC/myofibroblast and endothelial states have enough genes to run
 - macrophage states are not forced because they do not have enough donor-supported cirrhosis-up genes in this compact run
@@ -295,11 +305,11 @@ Outputs:
 
 ![pathfindR Reactome bar plot](../reports/figures/pathfindr_pseudobulk_reactome_barplot.png)
 
-The bar plot shows the strongest Reactome terms from pseudobulk disease-up signatures after the active-subnetwork step. This makes the HSC/myofibroblast matrix module easy to inspect.
+The bar plot shows the strongest Reactome terms from significant pseudobulk signatures after the active-subnetwork step. This makes the HSC/myofibroblast matrix module easy to inspect.
 
 ![pathfindR Reactome dot plot](../reports/figures/pathfindr_pseudobulk_reactome_dotplot.png)
 
-The dot plot shows both enrichment strength and the number of up-regulated pseudobulk genes supporting each term. This helps separate a pathway with broad donor-supported gene evidence from one driven by only a few genes.
+The dot plot shows both enrichment strength and the number of significant pseudobulk genes supporting each term. This helps separate a pathway with broad donor-supported gene evidence from one driven by only a few genes.
 
 Result:
 
@@ -354,6 +364,17 @@ Candidate categories:
 The dashboard includes dropdowns for candidate class and clinical use case.
 
 ## 10. Validation
+
+Validation is treated as independent support, not as a merged atlas. The datasets have different assays and processing histories, so the safer approach is to harmonize gene symbols, disease labels, and broad compartments, then test whether candidates move in the expected direction.
+
+| Dataset | What it validates | Main metadata | Main caution |
+|---|---|---|---|
+| GSE244832 | MASH-relevant HSC/myofibroblast expression | condition, focused compartment, candidate expression | processed object, so not a full raw reanalysis |
+| GSE207310 | bulk human NAFLD/NASH directionality | disease label, fibrosis grade, biopsy metadata | bulk signal cannot identify cell of origin |
+| GSE136103 blood | circulating expression and specificity risk | blood library IDs and candidate expression | not a liver fibrosis contrast |
+| GSE136103 mouse | ortholog conservation and preclinical direction | mouse healthy/fibrotic liver labels | small screen, not powered mouse DE |
+
+A validation result is strongest when the same candidate has the same disease direction, appears in the expected compartment or tissue context, and survives enough metadata QC to trust the comparison. PCA or correlation heatmaps are useful in a larger harmonized atlas; here, trend plots and directionality bars are clearer because the validation datasets are intentionally kept separate.
 
 ### GSE244832
 
@@ -426,16 +447,12 @@ Priority action plan:
 
 Clinical and industry context:
 
-- Resmetirom approval shows the value of liver-directed metabolic mechanisms in F2-F3 MASH.
-- Semaglutide approval shows the importance of systemic metabolic benefit plus histologic endpoints.
-- Selonsertib and simtuzumab failures show why fibrosis targets need strong mechanism, patient selection, and response biomarkers.
-- FGF21 programs such as pegozafermin and efruxifermin show continued interest in metabolic-fibrotic biology and compensated cirrhosis.
-
-Where Enformer or DNABERT-like models fit:
-
-- They are useful if the question is regulatory: variants, enhancers, promoter effects, or cell-type-specific gene regulation.
-- They do not prove that perturbing SMOC2, PDGFRA, or TREM2 will reverse fibrosis.
-- In this project they would be an optional evidence column for regulatory plausibility, not a replacement for transcriptomics, protein localization, and perturbation assays.
+- Resmetirom/Rezdiffra from Madrigal targets THRB. It is not one of the candidates, but it shows the value of liver-directed metabolic therapy in F2-F3 MASH.
+- Semaglutide/Wegovy from Novo Nordisk acts through GLP1R biology. It is not one of the candidates, but it sets a high clinical bar for metabolic benefit plus histologic endpoints.
+- Pegozafermin from 89bio/Roche and efruxifermin from Akero are FGF21 analog programs. They are not the same genes, but they are relevant comparators for metabolic-fibrotic trial strategy.
+- Selonsertib from Gilead targeted ASK1/MAP3K5 and failed in late-stage NASH fibrosis, arguing for stronger patient selection and pharmacodynamic evidence.
+- Simtuzumab from Gilead targeted LOXL2. This is adjacent to matrix-remodeling biology, but LOXL2 is not a top near-term nomination in this analysis.
+- CM-101 from ChemomAb targets CCL24. It is not a direct candidate, but it is conceptually related to chemokine and inflammatory fibrosis biology, including ACKR1 context.
 
 ## 12. Next Steps
 
@@ -462,5 +479,3 @@ Most useful follow-up work:
 - FDA Wegovy MASH approval. https://www.fda.gov/drugs/news-events-human-drugs/fda-approves-treatment-serious-liver-disease-known-mash
 - Gilead STELLAR-3 selonsertib update. https://www.gilead.com/news/news-details/2019/gilead-announces-topline-data-from-phase-3-stellar-3-study-of-selonsertib-in-bridging-fibrosis-f3-due-to-nonalcoholic-steatohepatitis-nash
 - Roche acquisition of 89bio and pegozafermin context. https://www.roche.com/media/releases/med-cor-2025-09-18
-- Avsec et al. Enformer. Nature Methods, 2021. https://www.nature.com/articles/s41592-021-01252-x
-- Ji et al. DNABERT. Bioinformatics, 2021. https://academic.oup.com/bioinformatics/article/37/15/2112/6128680

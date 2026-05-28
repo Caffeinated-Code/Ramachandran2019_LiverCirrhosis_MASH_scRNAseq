@@ -8,9 +8,10 @@ Primary discovery uses **GSE136103**, the Ramachandran et al. human cirrhosis sc
 
 1. [Executive summary](reports/executive_submission_summary.html): the short report, key results, translational interpretation, and next steps.
 2. [Analysis walkthrough](docs/analysis_walkthrough.md): technical methods, why each choice was made, what was inferred, and where the caveats are.
-3. [Written responses](reports/screening_responses/README.md): answers to the eight technical questions.
-4. [Interactive dashboard](https://caffeinated-code.shinyapps.io/fibrotarget-liver/): browser-hosted Shiny app for UMAP, candidate table, scoring, DE, validation, and QC views. Local run notes are in [dashboard/README.md](dashboard/README.md).
-5. [Nextflow demo](nextflow/fibrotarget_demo/README.md): local and AWS-ready reproducibility demo.
+3. [Biology primer](docs/biology_primer_liver_fibrosis.md): quick grounding for the liver cell compartments and why they matter in fibrosis.
+4. [Written responses](reports/screening_responses/README.md): answers to the eight technical questions.
+5. [Interactive dashboard](https://caffeinated-code.shinyapps.io/fibrotarget-liver/): browser-hosted Shiny app for UMAP, candidate table, scoring, DE, validation, and QC views. Local run notes are in [dashboard/README.md](dashboard/README.md).
+6. [Nextflow demo](nextflow/fibrotarget_demo/README.md): local and AWS-ready reproducibility demo.
 
 Supporting details are consolidated in [docs/technical_appendix.md](docs/technical_appendix.md).
 

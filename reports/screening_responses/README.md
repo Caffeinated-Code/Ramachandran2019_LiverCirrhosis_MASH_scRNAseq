@@ -79,7 +79,7 @@ I would calculate the same core metrics for every dataset, then interpret thresh
 | sample yield | failed prep or biased capture | inspect cells per donor, fraction, and disease group |
 | assay type | scRNA-seq versus snRNA-seq differs biologically and technically | keep as metadata and use in sensitivity analysis |
 
-For scRNA-seq, I would start with a low-gene filter around 200 genes, review mitochondrial percentage around 15-25 percent, and remove extreme high-gene or high-UMI cells only after checking whether they are true doublets. For snRNA-seq, mitochondrial percentage is less informative, intronic/nuclear signal matters more, and thresholds can be lower or shifted by chemistry. 
+For scRNA-seq, I would start with a low-gene filter around 200 genes, review mitochondrial percentage around 15-25 percent, and remove extreme high-gene or high-UMI cells only after checking whether they are true doublets. In fibrotic liver, I would lean toward the higher end of that mitochondrial review range because stressed, hypoxic, inflamed, or activated diseased cells may carry real injury biology. For snRNA-seq, mitochondrial percentage is less informative, intronic/nuclear signal matters more, and thresholds can be lower or shifted by chemistry. I would never copy scRNA-seq thresholds blindly onto snRNA-seq.
 
 Primary dataset example:
 
@@ -255,7 +255,7 @@ Cell-level DE still has a role. It is useful for screening and marker discovery 
 
 I would start with a transparent scoring model, then add ML only when the data can support it.
 
-For a small donor dataset, a rule-based score is stronger and intuitive than an ML black-box model. The score should include:
+For a small donor dataset, a rule-based score is stronger and easier to audit than a complex model. The score should include:
 
 - donor-level disease association
 - cell-type specificity
@@ -282,13 +282,13 @@ How AI could help:
 - summarize literature and trial evidence
 - retrieve perturbation evidence
 - generate candidate rationales
-- score regulatory plausibility using Enformer or DNABERT-style models when the hypothesis is about gene regulation or variant effects
+- flag missing evidence and conflicts between datasets
 
 Where AI should not be overused:
 
-- Enformer and DNABERT do not tell us that perturbing a gene will reverse fibrosis in HSCs.
-- Sequence models may add a regulatory-evidence column if we have relevant enhancers, ATAC peaks, variants, or promoter hypotheses.
-- They are not substitutes for donor-aware transcriptomics, protein localization, and perturbation assays.
+- A model-generated rationale does not prove that perturbing a gene will reverse fibrosis in HSCs.
+- Literature retrieval can over-weight popular genes and miss negative results.
+- It is not a substitute for donor-aware transcriptomics, protein localization, and perturbation assays.
 
 My final shortlist would come from the intersection of statistics, biology, modality, validation, safety, and current players in this domain and not from one model score.
 
@@ -405,6 +405,8 @@ Nextflow demo:
 make nextflow-demo
 ```
 
+The demo is small on purpose, but it now exercises the same contract as the production workflow: read a samplesheet, attach metadata, run QC checks, create a PCA/UMAP-style embedding, screen candidate DE direction, summarize pathway themes, rank candidates, and write a Markdown report.
+
 Direct Nextflow local run:
 
 ```bash
@@ -495,5 +497,3 @@ Final deliverables:
 - LIANA cell-cell communication framework. https://github.com/saezlab/liana
 - FDA Rezdiffra snapshot. https://www.fda.gov/drugs/drug-approvals-and-databases/drug-trials-snapshots-rezdiffra
 - FDA Wegovy MASH approval. https://www.fda.gov/drugs/news-events-human-drugs/fda-approves-treatment-serious-liver-disease-known-mash
-- Avsec et al. Enformer. https://www.nature.com/articles/s41592-021-01252-x
-- Ji et al. DNABERT. https://academic.oup.com/bioinformatics/article/37/15/2112/6128680

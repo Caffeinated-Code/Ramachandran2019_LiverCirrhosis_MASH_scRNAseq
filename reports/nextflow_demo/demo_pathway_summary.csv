@@ -1,0 +1,4 @@
+pathway_theme,genes_tested,genes_higher_in_cirrhosis,best_gene,best_fdr
+matrix_stromal,6,1,SMOC2,3.927986480050778e-7
+vascular_remodeling,2,0,ACKR1,1.9976901460495728e-4
+macrophage_injury,4,0,TREM2,3.927986480050778e-7

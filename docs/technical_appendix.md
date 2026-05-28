@@ -1,6 +1,6 @@
 # Technical Appendix
 
-This appendix keeps the operational details in one place so the README can stay clean.
+This appendix keeps the operational details in one place so the README can stay clean. For biological context on the liver cell compartments, see [biology_primer_liver_fibrosis.md](biology_primer_liver_fibrosis.md).
 
 ## Repository Structure
 
@@ -97,6 +97,7 @@ Executive and interpretation:
 - `reports/executive_submission_summary.Rmd`
 - `reports/executive_submission_summary.md`
 - `docs/analysis_walkthrough.md`
+- `docs/biology_primer_liver_fibrosis.md`
 - `reports/screening_responses/README.md`
 
 Core tables:
@@ -176,6 +177,8 @@ Local demo:
 ```bash
 make nextflow-demo
 ```
+
+The demo outputs a compact report plus QC, embedding, candidate DE, pathway-theme, and ranked-candidate artifacts under `reports/nextflow_demo/`. It is a small contract test for a dataset-independent workflow, not a substitute for the full Seurat run.
 
 Direct Nextflow run:
 

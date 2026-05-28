@@ -1,9 +1,9 @@
 disease_state,compartment_call,cells
-cirrhotic,endothelial,60
-cirrhotic,macrophage_monocyte,60
-cirrhotic,mesenchymal_HSC_myofibroblast,60
-cirrhotic,other_or_unresolved,60
 healthy,endothelial,60
 healthy,macrophage_monocyte,60
 healthy,mesenchymal_HSC_myofibroblast,60
 healthy,other_or_unresolved,60
+cirrhotic,endothelial,60
+cirrhotic,macrophage_monocyte,60
+cirrhotic,mesenchymal_HSC_myofibroblast,60
+cirrhotic,other_or_unresolved,60

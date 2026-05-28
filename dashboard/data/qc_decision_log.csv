@@ -1,6 +1,6 @@
 metric,threshold_or_action,used_for_filtering,reason
 Detected genes per cell,>=200,TRUE,Removes low-complexity droplets while retaining stressed disease-relevant cells.
-Mitochondrial percent,<=25%,TRUE,Removes likely damaged cells; threshold is conservative because fibrotic liver can contain stressed biology.
+Mitochondrial percent,<=25%,TRUE,Typical scRNA-seq filters often review 15-25% mitochondrial reads. This run uses 25% to remove likely damaged cells while retaining diseased or stressed liver cells with real injury biology.
 UMI count,reviewed by library; no hard upper cutoff in compact run,FALSE,"High UMI cells can be doublets, but liver cell types differ in RNA content; hard filtering could remove large or active cells."
 Ribosomal percent,reviewed by library; no hard cutoff,FALSE,High ribosomal signal can reflect cell state or technical stress and is interpreted with other metrics.
 Hemoglobin percent,reviewed by library; no hard cutoff,FALSE,Flags erythrocyte/RBC ambient RNA contamination without removing liver cells solely on this metric.

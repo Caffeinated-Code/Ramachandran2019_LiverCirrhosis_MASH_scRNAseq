@@ -49,7 +49,7 @@ dir.create(work_root, recursive = TRUE, showWarnings = FALSE)
 for (i in seq_len(nrow(state_map))) {
   state <- state_map$refined_cell_state[[i]]
   input <- de |>
-    filter(refined_cell_state == state, log2FC > 0, p_adj < 0.05) |>
+    filter(refined_cell_state == state, p_adj < 0.05) |>
     transmute(Gene.symbol = gene, logFC = log2FC, adj.P.Val = p_adj) |>
     distinct(Gene.symbol, .keep_all = TRUE) |>
     as.data.frame()
@@ -62,7 +62,7 @@ for (i in seq_len(nrow(state_map))) {
       label = state_map$label[[i]],
       n_input_genes = n_input,
       status = "not_run",
-      reason = "Fewer than 10 cirrhosis-up donor-level pseudobulk genes at FDR < 0.05.",
+      reason = "Fewer than 10 significant donor-level pseudobulk genes at FDR < 0.05.",
       gene_sets = "Reactome",
       p_val_threshold = 0.05,
       enrichment_threshold = 0.1,
@@ -153,7 +153,7 @@ if (nrow(pathfindr_results) > 0) {
     facet_wrap(~label, scales = "free_y") +
     labs(
       title = "pathfindR Reactome enrichment from donor-level pseudobulk DE",
-      subtitle = "Active-subnetwork search on cirrhosis-up genes at FDR < 0.05",
+      subtitle = "Active-subnetwork search on significant pseudobulk genes at FDR < 0.05",
       x = "-log10(lowest enrichment p-value)",
       y = NULL,
       fill = "Pseudobulk state"
@@ -163,17 +163,17 @@ if (nrow(pathfindr_results) > 0) {
   save_plot(p_bar, file.path(cfg$paths$figures_dir, "pathfindr_pseudobulk_reactome_barplot.png"), 11, 7)
 
   p_dot <- top_terms |>
-    ggplot(aes(Fold_Enrichment, term_short, size = n_up_genes, color = -log10(pmax(lowest_p, 1e-300)))) +
+    ggplot(aes(Fold_Enrichment, term_short, size = n_up_genes + n_down_genes, color = -log10(pmax(lowest_p, 1e-300)))) +
     geom_point(alpha = 0.9) +
     facet_wrap(~label, scales = "free_y") +
     scale_color_viridis_c(option = "C") +
     labs(
       title = "pathfindR active-subnetwork terms and supporting genes",
-      subtitle = "Dot size is the number of up-regulated pseudobulk genes in the term",
+      subtitle = "Dot size is the number of significant pseudobulk genes in the term",
       x = "Fold enrichment",
       y = NULL,
       color = "-log10(p)",
-      size = "Up genes"
+      size = "Genes"
     ) +
     theme_project() +
     theme(legend.position = "bottom")
@@ -184,7 +184,7 @@ if (nrow(pathfindr_results) > 0) {
     coord_flip() +
     labs(
       title = "pathfindR pseudobulk analysis was not run",
-      subtitle = "No refined state had enough cirrhosis-up donor-level genes at FDR < 0.05",
+      subtitle = "No refined state had enough significant donor-level genes at FDR < 0.05",
       x = NULL,
       y = "Input genes"
     ) +
