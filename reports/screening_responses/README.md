@@ -371,7 +371,7 @@ src/           shared helper functions
 nextflow/      local and AWS workflow execution
 dashboard/     Shiny app and dashboard-ready data
 reports/       HTML summary, tables, figures, written responses
-docs/          analysis walkthrough, technical appendix, biology primer
+docs/          analysis walkthrough and technical appendix
 data/demo/     tiny tracked demo dataset
 ```
 

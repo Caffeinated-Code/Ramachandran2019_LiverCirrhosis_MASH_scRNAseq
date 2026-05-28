@@ -12,7 +12,7 @@ scripts/       Data prep, validation, evidence enrichment, checks
 nextflow/      Local and AWS workflow scaffold
 dashboard/     Shiny app and dashboard-ready CSVs
 reports/       Executive report, written responses, figures, tables
-docs/          Method walkthrough, technical appendix, biology primer
+docs/          Method walkthrough and technical appendix
 data/demo/     Tiny tracked demo dataset
 data/metadata/ Curated public-data manifests
 ```

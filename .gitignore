@@ -1,6 +1,12 @@
 # Private/local context
 ceo_conversation_private.txt
 assignment_prompt_private.pdf
+PROJECT_HANDOFF.md
+
+# Personal learning/reference artifacts
+docs/biology_primer_liver_fibrosis.docx
+docs/assets/primer/
+scripts/build_biology_primer.py
 
 # Raw and external data
 data/raw/
