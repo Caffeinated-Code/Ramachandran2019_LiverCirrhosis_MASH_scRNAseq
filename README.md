@@ -9,7 +9,7 @@ Primary discovery uses **GSE136103**, the Ramachandran et al. human cirrhosis sc
 1. [Executive summary](reports/executive_submission_summary.html): the short report, key results, translational interpretation, and next steps.
 2. [Analysis walkthrough](docs/analysis_walkthrough.md): technical methods, why each choice was made, what was inferred, and where the caveats are.
 3. [Written responses](reports/screening_responses/README.md): answers to the eight technical questions.
-4. [Dashboard](dashboard/README.md): interactive UMAP, candidate table, scoring, DE, validation, and QC views.
+4. [Dashboard](dashboard/README.md): interactive UMAP, candidate table, scoring, DE, validation, and QC views. A hosted shinyapps.io link can be added here after deployment.
 5. [Nextflow demo](nextflow/fibrotarget_demo/README.md): local and AWS-ready reproducibility demo.
 
 Supporting details are consolidated in [docs/technical_appendix.md](docs/technical_appendix.md).

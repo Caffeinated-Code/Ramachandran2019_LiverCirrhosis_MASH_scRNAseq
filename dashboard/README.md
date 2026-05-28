@@ -8,6 +8,17 @@ Run from the repository root:
 Rscript -e "shiny::runApp('dashboard')"
 ```
 
+Deploy to shinyapps.io:
+
+```bash
+export SHINYAPPS_ACCOUNT="your-account"
+export SHINYAPPS_TOKEN="your-token"
+export SHINYAPPS_SECRET="your-secret"
+Rscript scripts/deploy_shinyapps.R
+```
+
+After deployment, add the returned shinyapps.io URL to the root README so reviewers can open the dashboard directly from GitHub.
+
 Main views:
 
 - overview UMAP colored by disease state, donor, fraction, compartment, or refined label
