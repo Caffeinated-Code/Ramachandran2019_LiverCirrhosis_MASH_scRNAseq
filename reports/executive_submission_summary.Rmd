@@ -570,6 +570,46 @@ cd Ramachandran2019_LiverCirrhosis_MASH_scRNAseq
 make all
 ```
 
+The `make all` target runs the full compact workflow in sequence:
+
+```text
+check runtime
+  -> fetch public data
+  -> curate metadata
+  -> run Seurat analysis and QC
+  -> refine labels with the published reference
+  -> run donor-level pseudobulk DE
+  -> run pathfindR pathway analysis
+  -> prioritize candidates
+  -> run validation modules
+  -> enrich translational evidence
+  -> prepare dashboard data
+  -> render reports
+```
+
+Individual components can also be run directly when reviewing or debugging:
+
+```bash
+make check
+make fetch-data
+make curate
+make analyze
+make refine-labels
+make pseudobulk
+make pathfindr
+make prioritize
+make validation
+make hsc-validation
+make gse244832-focused
+make gse207310-validation
+make secondary-validation
+make evidence
+make translational-evidence
+make dashboard
+make report
+make render-summary
+```
+
 For a quick reproducibility smoke test without downloading the full public archive:
 
 ```bash

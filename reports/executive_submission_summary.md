@@ -72,6 +72,8 @@ The repo includes:
 - `dashboard/app.R` for interactive review
 - `nextflow/fibrotarget_demo/` for a local and AWS-ready workflow contract test
 
+The full compact analysis can be run with `make all`. That target checks the runtime, fetches public data, curates metadata, runs the Seurat analysis, refines labels, runs pseudobulk DE, runs pathfindR, prioritizes candidates, runs validation modules, prepares dashboard data, and renders reports. Each component can also be run directly with targets such as `make analyze`, `make pseudobulk`, `make pathfindr`, `make dashboard`, and `make render-summary`.
+
 The Nextflow demo reads a tracked 10x-style toy dataset, attaches metadata, computes QC flags, creates a PCA/UMAP-style embedding, screens candidate direction, summarizes pathway themes, ranks candidates, and writes a small report. It proves pipeline wiring and I/O behavior. It does not replace the full Seurat analysis.
 
 ## Most Useful Next Steps
